@@ -9,7 +9,7 @@ import main.java.com.huaban.analysis.jieba.viterbi.Seg;
 
 public class jieba_seg 
 {
-	public String jieba_Seg(String weibo)
+	public ArrayList<String> jieba_Seg(String weibo)
 	{
 		System.out.println("Processing...");
 		Seg seg = new Seg();
@@ -18,7 +18,7 @@ public class jieba_seg
 
 		//test output
 		System.out.println(seg_result.toString());
-		return null;
+		return seg_result;
 	}
 
 }
