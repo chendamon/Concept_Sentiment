@@ -22,6 +22,7 @@ public class getConceptsFWT
 {
 	//存储相近词条的url,以及描述
 	//2015/12/1
+	//wiki suls存储的是category：url
 	HashMap<String,String> Surls;
 	public getConceptsFWT()
 	{
@@ -34,7 +35,10 @@ public class getConceptsFWT
 	public void getReFB(String keyword) throws IOException
 	{
 		ArrayList<String> Tags = new ArrayList<String>();
-		URL url = new URL("http://baike.baidu.com/search/word?word="+keyword);
+		//baidu.com
+		//URL url = new URL("http://baike.baidu.com/search/word?word="+keyword);
+		//zh.wikipedia.com
+		URL url = new URL("https://zh.wikipedia.org/wiki/"+keyword);
 		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();           
 		urlcon.connect();         //获取连接 
 		System.out.println("get connection...");
@@ -44,6 +48,36 @@ public class getConceptsFWT
 		boolean zone = false;
 		boolean s_zone = false;
 		System.out.println("Reading pages");
+		//wikipedia
+		//category get
+		//2012/12/2
+		while((l = buffer.readLine()) != null)
+		{
+			//直接是一行所有类别，直接正则表达式匹配
+			if(l.contains("Special:页面分类"))
+			{
+				System.out.println("wiki found");
+				String t = l.substring(l.indexOf("<ul>"),l.indexOf("</ul>"));
+				String regex ="href=.*?>";
+				Pattern p_u = Pattern.compile(regex);
+				Matcher m = p_u.matcher(t);
+				
+				while(m.find())
+				{
+					String temp = m.group(0);
+					String[] items = temp.split("\\s");
+					String category_url = "http://zh.wikipedia.org"+items[0].replace("href=", "").replaceAll("\"", "");
+					String category_dep = items[1].replace("title=\"Category:", "").replaceAll("\">", "");
+					//过滤掉一些明显不起作用的category
+					//如什么时候出生
+					if(category_dep.contains("出生"))
+						continue;
+					this.Surls.put(category_dep, category_url);
+				}
+			}
+			
+		}
+		//baike.baidu.com
 		while((l=buffer.readLine())!=null)
 		{
 			//多义词处理情况
