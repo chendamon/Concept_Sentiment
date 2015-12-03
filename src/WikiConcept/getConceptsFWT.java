@@ -28,17 +28,31 @@ public class getConceptsFWT
 	{
 		this.Surls = new HashMap<String,String>();
 	}
+	public void clear()
+	{
+		this.Surls.clear();
+	}
+	public HashMap<String,String> getSUrls()
+	{
+		return this.Surls;
+	}
 	//给百度百科一个搜索请求
 	//并根据返回结果找到词条标签，百度这也是有的
 	//待解决的问题是如果搜索出来是一堆列表
 	//2015/11/30
-	public void getReFB(String keyword) throws IOException
+	public void getReFB(String keyword,String urls) throws IOException
 	{
 		ArrayList<String> Tags = new ArrayList<String>();
 		//baidu.com
 		//URL url = new URL("http://baike.baidu.com/search/word?word="+keyword);
 		//zh.wikipedia.com
-		URL url = new URL("https://zh.wikipedia.org/wiki/"+keyword);
+		URL url = null;
+		if(urls == null)
+		{
+		    url = new URL("https://zh.wikipedia.org/wiki/"+keyword);
+		}
+		else
+			url = new URL(urls);
 		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();           
 		urlcon.connect();         //获取连接 
 		System.out.println("get connection...");
