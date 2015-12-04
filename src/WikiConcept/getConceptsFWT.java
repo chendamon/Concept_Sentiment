@@ -9,6 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,7 @@ import java.util.regex.Pattern;
  * 主要是探索如何在连接上加在内容
  * author biront
  * 2015/11/30
+ * 语义消歧还是需要整个网页的文本内容 
  */
 public class getConceptsFWT 
 {
@@ -40,8 +43,12 @@ public class getConceptsFWT
 	//并根据返回结果找到词条标签，百度这也是有的
 	//待解决的问题是如果搜索出来是一堆列表
 	//2015/11/30
-	public void getReFB(String keyword,String urls) throws IOException
+	//2015/12/4
+	//实体出现计数也放到这里边吧
+	public int getReFB(String keyword,String urls,ArrayList<String> entitys) throws IOException
 	{
+		//实体出现次数的计数变量
+		int app_time = 0;
 		ArrayList<String> Tags = new ArrayList<String>();
 		//baidu.com
 		//URL url = new URL("http://baike.baidu.com/search/word?word="+keyword);
@@ -65,8 +72,47 @@ public class getConceptsFWT
 		//wikipedia
 		//category get
 		//2012/12/2
+		//sy 存储待消气的网页
+		HashMap<String,String> sy = new HashMap<String,String>();
+		sy.clear();
 		while((l = buffer.readLine()) != null)
 		{
+			//实体出现计数
+			if(entitys != null)
+			{
+				for(int i = 0; i < entitys.size(); i++)
+				{
+					if(l.contains(entitys.get(i)))
+						app_time++;
+				}
+			}
+			
+			
+			if(l.contains("id=\"mw-content-text\""))
+				s_zone = true;
+			//进行列表的提取
+			else if(s_zone&&l.contains("a href="))
+			{
+				String regex ="href=.*?>";
+				Pattern p_u = Pattern.compile(regex);
+				Matcher m = p_u.matcher(l);
+				while(m.find())
+				{
+					String temp = m.group(0);
+					String[] items = temp.split("\\s");
+					String category_url = "http://zh.wikipedia.org"+items[0].replace("href=", "").replaceAll("\"", "");
+					String category_dep = items[1].replace("title=\"Category:", "").replaceAll("\">", "");
+					sy.put(category_url, category_dep);
+				}
+				
+			}
+			else if(s_zone&&l.contains("<table"))
+			{
+				break;
+			}
+			
+				
+			
 			//直接是一行所有类别，直接正则表达式匹配
 			if(l.contains("Special:页面分类"))
 			{
@@ -92,59 +138,105 @@ public class getConceptsFWT
 			
 		}
 		//baike.baidu.com
-		while((l=buffer.readLine())!=null)
-		{
-			//多义词处理情况
-			//2015/12/01
-			if(l.contains("多义词"))
-			{
-				s_zone = true;
-			}
-			else if(s_zone)
-			{
-				
-				String url_regex ="href=.*?</a>";
-				//String des_regex = "：.*?</a>";
-				Pattern p_u = Pattern.compile(url_regex);
-				Matcher m = p_u.matcher(l);
-				while(m.find())
-				{
-					String t = m.group(0);
-					String c_url = "www.baike.baidu.com"+t.substring(t.indexOf("\"")+1, t.lastIndexOf("\""));
-				    String c_des = t.substring(t.indexOf(">")+1, t.lastIndexOf("<")).replaceAll(keyword+"：", "");
-				    this.Surls.put(c_url, c_des);
-				}
-				if(l.contains("</ul>"))
-					break;
-			}
-			if(l.contains("open-tag-item"))
-			{
-				System.out.println("dinfya");
-				 zone = true;
-			}
-			else if(zone)
-			{
-				if(l.contains("div"))
-					break;
-				else if(!l.contains("<")&&!l.contains("，"))
-					Tags.add(l);
-			} 
-	     }    
+//		while((l=buffer.readLine())!=null)
+//		{
+//			//多义词处理情况
+//			//2015/12/01
+//			if(l.contains("多义词"))
+//			{
+//				s_zone = true;
+//			}
+//			else if(s_zone)
+//			{
+//				
+//				String url_regex ="href=.*?</a>";
+//				//String des_regex = "：.*?</a>";
+//				Pattern p_u = Pattern.compile(url_regex);
+//				Matcher m = p_u.matcher(l);
+//				while(m.find())
+//				{
+//					String t = m.group(0);
+//					String c_url = "www.baike.baidu.com"+t.substring(t.indexOf("\"")+1, t.lastIndexOf("\""));
+//				    String c_des = t.substring(t.indexOf(">")+1, t.lastIndexOf("<")).replaceAll(keyword+"：", "");
+//				    this.Surls.put(c_url, c_des);
+//				}
+//				if(l.contains("</ul>"))
+//					break;
+//			}
+//			if(l.contains("open-tag-item"))
+//			{
+//				System.out.println("dinfya");
+//				 zone = true;
+//			}
+//			else if(zone)
+//			{
+//				if(l.contains("div"))
+//					break;
+//				else if(!l.contains("<")&&!l.contains("，"))
+//					Tags.add(l);
+//			} 
+//	     }    
 		 buffer.close();
 		 if(Tags.size()>0)
 		 {
 			 System.out.println("we found something.");
 			 System.out.println(Tags.toString());
 		 }
+		 else if(sy.size() > 0)
+		 {
+			 //对歧义进行处理的部分
+		 }
+		 return app_time;
 	}
 	//近义词的情况，比如百度百科中的韦德
 	//author biront
 	//2015/12/01
 	//如何处理？对维基百科而言是不是可以用infobox而不是所有的网页内容？
 	//编码的难度还是有的，今天把它尽量搞完，用寝室的网
-	public void getSy(ArrayList<String> entities)
+	//2015/12/4
+	//句子中其他实体出现的次数，直接统计次数好了
+	public void getSy(ArrayList<String> entities,HashMap<String,String> url_title) throws IOException
 	{
+		int max_time = -1;
+		String the_url = null;
+		String the_title = null;
+		//空间换时间了，为了不进行第二遍扫描
+		HashMap<String,String> backup = new HashMap<String,String>();
+		Iterator iter = url_title.entrySet().iterator();
+		while (iter.hasNext()) 
+		{
+			Map.Entry entry = (Map.Entry) iter.next();
+			String key = (String) entry.getKey();
+			String val = (String) entry.getValue();
+			this.Surls.clear();
+			int temp = this.getReFB(null, key, entities);
+			if(temp > max_time)
+			{
+				backup.clear();
+				max_time = temp;
+				Iterator it = this.Surls.entrySet().iterator();
+				while(it.hasNext())
+				{
+					Map.Entry en = (Map.Entry) it.next();
+					String k = (String) en.getKey();
+					String v = (String) en.getValue();
+					backup.put(k, v);
+				}
+			}
+		}
+		this.Surls.clear();
+		Iterator it =backup.entrySet().iterator();
+		while(it.hasNext())
+		{
+			Map.Entry en = (Map.Entry) it.next();
+			String k = (String) en.getKey();
+			String v = (String) en.getValue();
+			//backup.put(k, v);
+			this.Surls.put(k, v);
+		}
+		system
 		
 	}
+	
 
 }

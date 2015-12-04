@@ -3,10 +3,10 @@ package Sentiment;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import edu.stanford.nlp.parser.lexparser.*;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TypedDependency;
-import edu.stanford.nlp.trees.international.pennchinese.ChineseGrammaticalStructure;
+//import edu.stanford.nlp.parser.lexparser.*;
+//import edu.stanford.nlp.trees.Tree;
+//import edu.stanford.nlp.trees.TypedDependency;
+//import edu.stanford.nlp.trees.international.pennchinese.ChineseGrammaticalStructure;
 /*
  * parse部分
  * 为找到实体对应的情感词做准备
@@ -26,14 +26,14 @@ public class Parse
 		System.out.println("sentence: "+sentence);
 		//parse part
 		//2015/12/1
-		String model = "edu/stanford/nlp/models/lexparser/chineseFactored.ser.gz";
-		LexicalizedParser lp = LexicalizedParser.loadModel(model);
-		Tree t = lp.parse(sentence);
-		System.out.println(t);
-		//变换其他格式,依赖格式
-		ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(t);
-	    Collection<TypedDependency> tdl = gs.typedDependenciesCollapsed();
-	    System.out.println(tdl);
+//		String model = "edu/stanford/nlp/models/lexparser/chineseFactored.ser.gz";
+//		LexicalizedParser lp = LexicalizedParser.loadModel(model);
+//		Tree t = lp.parse(sentence);
+//		System.out.println(t);
+//		//变换其他格式,依赖格式
+//		ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(t);
+//	    Collection<TypedDependency> tdl = gs.typedDependenciesCollapsed();
+//	    System.out.println(tdl);
 	}
 
 }

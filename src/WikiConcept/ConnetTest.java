@@ -8,7 +8,7 @@ public class ConnetTest
 	{
 		getConceptsFWT gc = new getConceptsFWT();
 		System.out.println("Processing...");
-		gc.getReFB("科比",null);
+		gc.getReFB("科比",null,null);
 		
 	}
 

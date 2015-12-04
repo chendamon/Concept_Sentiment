@@ -27,7 +27,7 @@ public class buildCTree
 		node.setDep(dep);
 		tree.addNode(node);
 		fwt.clear();
-		fwt.getReFB(null, url);
+		fwt.getReFB(null, url,null);
 		HashMap<String,String> sons = fwt.getSUrls();
 		int size = sons.size();
 		node.setBra(size);
