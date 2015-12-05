@@ -45,6 +45,8 @@ public class getConceptsFWT
 	//2015/11/30
 	//2015/12/4
 	//实体出现计数也放到这里边吧
+	//那些没有出现的实体，或者根本不是实体的内容
+	//2015/12/5
 	public int getReFB(String keyword,String urls,ArrayList<String> entitys) throws IOException
 	{
 		//实体出现次数的计数变量
@@ -86,7 +88,9 @@ public class getConceptsFWT
 						app_time++;
 				}
 			}
-			
+			//如果根本不是实体直接返回
+			if(l.contains("mw-search-result-heading"))
+				break;
 			
 			if(l.contains("id=\"mw-content-text\""))
 				s_zone = true;
@@ -234,7 +238,7 @@ public class getConceptsFWT
 			//backup.put(k, v);
 			this.Surls.put(k, v);
 		}
-		system
+		System.out.println("xiaoqi done!");
 		
 	}
 	
