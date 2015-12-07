@@ -7,6 +7,9 @@ import java.util.ArrayList;
  * 包含category以及url
  * author:biront
  * date:2015/12/3
+ * 
+ *需要在node里加入情感，并进行衰减计算，找到合适的衰减函数
+ *2015/12/7
  */
 public class Node 
 {
@@ -14,6 +17,7 @@ public class Node
 	String category_url;
 	int depth;
 	int branch;
+	double sentiment;
 	//存储子节点，暂时用这样的方式
 	ArrayList<Node> sons;
 	public Node(String name, String url)
@@ -23,6 +27,15 @@ public class Node
 		this.sons = new ArrayList<Node>();
 		this.depth = -1;
 		this.branch = -1;
+		this.sentiment = -99;
+	}
+	public void setSen(Double s)
+	{
+		this.sentiment = s;
+	}
+	public double getSentiment()
+	{
+		return this.sentiment;
 	}
 	public void setDep(int dep)
 	{
