@@ -11,7 +11,7 @@ import Sentiment.Sent_enti;
  * date 2015/12/7
  * 实体与情感绑定
  */
-public class Entity_Sent 
+public class Entity_Sent
 {
 	public HashMap<String,Integer> gule(ArrayList<String> weibo_seg_s,ArrayList<String> parse) throws Exception
 	{
