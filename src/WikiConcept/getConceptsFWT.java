@@ -134,7 +134,9 @@ public class getConceptsFWT
 					String category_dep = items[1].replace("title=\"Category:", "").replaceAll("\">", "");
 					//过滤掉一些明显不起作用的category
 					//如什么时候出生
-					if(category_dep.contains("出生"))
+					//过滤最终的页面，即页面分类总页面
+					//date 2015/12/9
+					if(category_dep.contains("出生")||category_dep.contains("页面分类"))
 						continue;
 					this.Surls.put(category_dep, category_url);
 				}
