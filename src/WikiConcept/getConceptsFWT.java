@@ -191,6 +191,7 @@ public class getConceptsFWT
 		 else if(sy.size() > 0)
 		 {
 			 //对歧义进行处理的部分
+			 this.getSy(entitys, sy);
 		 }
 		 return app_time;
 	}

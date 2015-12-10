@@ -1,6 +1,7 @@
 package WikiConcept;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -23,7 +24,7 @@ public class buildCTree
 		this.fwt = new getConceptsFWT();
 		this.fS = new findSent();
 	}
-	public Tree_C buildTree(String name, String url,int dep,HashMap<String,Integer> eS) throws IOException
+	public Tree_C buildTree(String name, String url,int dep,HashMap<String,Integer> eS,ArrayList<String> entitys) throws IOException
 	{
 		//深度优先搜索来做,迭代
 		Tree_C tree = new Tree_C();
@@ -37,7 +38,7 @@ public class buildCTree
 			node.setSen((double)this.fS.getS(eS, name));
 		}
 		fwt.clear();
-		fwt.getReFB(null, url,null);
+		fwt.getReFB(name, url,entitys);
 		HashMap<String,String> sons = fwt.getSUrls();
 		int size = sons.size();
 		node.setBra(size);
@@ -55,7 +56,7 @@ public class buildCTree
 			node.addSon(t);
 			
 			
-			Tree_C tree_t = buildTree(key,val,dep++,eS);
+			Tree_C tree_t = buildTree(key,val,dep++,eS,entitys);
 			tree.addTree(tree_t);
 		}
 		return tree;

@@ -21,6 +21,24 @@ public class Con_final
 	{
 		this.CP = new HashMap<String,Double>();
 	}
+	//返回前k个值
+	public HashMap<String,Double> getTopK(int k)
+	{
+		HashMap<String,Double> top_k = new HashMap<String,Double>();
+		int count = 0;
+		Iterator iter = CP.entrySet().iterator();
+		while (iter.hasNext()) 
+		{
+			Map.Entry entry = (Map.Entry) iter.next();
+			String key = (String) entry.getKey();
+			double val = (double) entry.getValue();
+			top_k.put(key, val);
+			count++;
+			if(count == k)
+				break;
+		}
+		return top_k;	
+	}
 	public void cal_CP(Tree_C t)
 	{
 		//计算概念的权重
