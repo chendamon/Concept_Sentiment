@@ -95,6 +95,10 @@ public class getConceptsFWT
 			if(l.contains("id=\"mw-content-text\""))
 				s_zone = true;
 			//进行列表的提取
+			/*
+			 * 2016/2/16
+			 *直接先进行title的判别，因为很多差一个字就差很多
+			 */
 			else if(s_zone&&l.contains("a href="))
 			{
 				String regex ="href=.*?>";
@@ -106,6 +110,7 @@ public class getConceptsFWT
 					String[] items = temp.split("\\s");
 					String category_url = "http://zh.wikipedia.org"+items[0].replace("href=", "").replaceAll("\"", "");
 					String category_dep = items[1].replace("title=\"Category:", "").replaceAll("\">", "");
+					
 					sy.put(category_url, category_dep);
 				}
 				

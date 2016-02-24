@@ -2,10 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="C:/Users/Birontchen/Documents/GitHub/Concept_Sentiment/ansj_seg-3.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Birontchen/Documents/GitHub/Concept_Sentiment/jieba_seg.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Birontchen/Documents/GitHub/Concept_Sentiment/nlp-lang-1.0.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Birontchen/Documents/GitHub/stanford-parser.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Birontchen/Documents/GitHub/stanford-parser-3.4.1-models.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Biront/Documents/GitHub/Concept_Sentiment/ansj_seg-3.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Biront/Documents/GitHub/Concept_Sentiment/nlp-lang-1.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Biront/Documents/GitHub/jython.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
