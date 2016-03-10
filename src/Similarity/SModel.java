@@ -1,5 +1,7 @@
 package Similarity;
 
+import java.util.ArrayList;
+
 import org.python.core.PyObject;
 import org.python.util.*;;
 /*
@@ -38,5 +40,56 @@ public class SModel
 		PyObject re = pe.eval("model.similarity(u\""+a+"\", u\""+b+"\")");
 		return re.asDouble();
 	}
+	//如何计算带情感的关键词？
+	//两种情况：用户与用户之间，微博与用户之间（微博的话默认概念情感为0）
+	
+	//两个用户之间的基于情感的相似度，都有一组concept：weight top-k
+	//最大的算术平均？
+	public double UU_Similarity(ArrayList<String> c_a, ArrayList<Double> w_a, ArrayList<String> c_b, ArrayList<Double> w_b, int k)
+	{
+		Sentiment_diff s_d = new Sentiment_diff();
+		//认为b是我们目前关注的用户
+		double score = 0;
+		for(int i = 0; i < k; i++)
+		{
+			double max = 0;
+			
+			for(int j = 0; j < k; j++)
+			{
+				double temp = this.Sfw2v(c_b.get(i), c_a.get(j))*w_a.get(j)*w_b.get(i);
+				double a = 0; double b = 0;//a,b 对应的sentiment
+				double sdiff = s_d.diff_abs(a, b);
+				if(max < temp*sdiff)
+					max = temp*sdiff;
+			}
+			score += max;
+		}
+		return score/k;
+	}
+	
+	//weibo与用户之间的相似度
+	//一组concept没有weight 且sentiment为0，另一组为正常数据
+	public double TU_Similarity(ArrayList<String> c_t, ArrayList<String> c_b, ArrayList<Double> w_b, int k)
+	{
+		Sentiment_diff s_d = new Sentiment_diff();
+		int tc_size = c_t.size();
+		double score = 0;
+		for(int i = 0; i < k; i++)
+		{
+			double max = 0;
+			
+			for(int j = 0; j < tc_size; j++)
+			{
+				double temp = this.Sfw2v(c_b.get(i), c_t.get(j))*1*w_b.get(i);
+				double b = 0;//a,b 对应的sentiment
+				double sdiff = s_d.diff_abs(0, b);
+				if(max < temp*sdiff)
+					max = temp*sdiff;
+			}
+			score += max;
+		}
+		return score/k;
+	}
+	
 
 }

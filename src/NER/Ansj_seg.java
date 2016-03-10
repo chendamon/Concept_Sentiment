@@ -3,7 +3,6 @@ package NER;
 import java.util.List;
 
 import org.ansj.domain.Term;
-import org.ansj.splitWord.analysis.NlpAnalysis;
 import org.ansj.splitWord.analysis.ToAnalysis;
 
 /*
@@ -18,7 +17,7 @@ public class Ansj_seg
 	{
 		System.out.println("Processing...");
 		List<Term> seg_result = ToAnalysis.parse(weibo);
-		///List<Term> seg_result = NlpAnalysis.parse(weibo);
+		//List<Term> seg_result = BaseAnalysis.parse(weibo);
 
 		//test output
 		System.out.println(seg_result);

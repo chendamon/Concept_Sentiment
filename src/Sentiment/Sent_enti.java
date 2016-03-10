@@ -44,14 +44,12 @@ public class Sent_enti
 	{
 		this.neg_s = new HashMap<String,Integer>();
 		this.pos_s = new HashMap<String,Integer>();
-		File pfile = new File("res/正面评价词语（中文）.txt");
+		File pfile = new File("pos.txt");
 		this.readF(pfile, 0);
-		pfile = new File("res/正面情感词语（中文）.txt");
-		this.readF(pfile, 0);
-		pfile = new File("res/负面评价词语（中文）.txt");
+		
+		pfile = new File("neg.txt");
 		this.readF(pfile, 1);
-		pfile = new File("res/负面情感词语（中文）.txt");
-		this.readF(pfile, 1);
+		
 		System.out.println("情感词加载完毕,pos: "+this.pos_s.size()+";neg: "+this.neg_s.size());
 	}
 	
