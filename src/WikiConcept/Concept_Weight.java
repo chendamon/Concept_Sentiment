@@ -1,5 +1,4 @@
 package WikiConcept;
-
 import java.util.Iterator;
 
 /*
@@ -16,19 +15,20 @@ public class Concept_Weight
 {
 	public double cal_Weight(String category, Tree_C tree)
 	{
-		int freq = 0;
-		double sum = 0;
-		Iterator it = tree.getTNodes().iterator();
-		while(it.hasNext())
-		{
-			Node temp = (Node) it.next();
-			if(temp.getName().equals(category))
-			{
-				freq++;
-				sum += 1/(Math.pow(temp.getBra(), temp.getDep()));
-			}
-		}
-		return sum/freq;
+//		int freq = 0;
+//		double sum = 0;
+//		Iterator it = tree.getTNodes().iterator();
+//		while(it.hasNext())
+//		{
+//			Node temp = (Node) it.next();
+//			if(temp.getName().equals(category))
+//			{
+//				freq++;
+//				sum += 1/(Math.pow(temp.getBra(), temp.getDep()));
+//			}
+//		}
+//		return sum/freq;
+		return 0.0;
 	}
 
 }

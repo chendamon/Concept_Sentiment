@@ -21,13 +21,14 @@ public class StopWords
 		File file = new File(filename);
 		if(!file.exists())
 			throw new Exception("Stop words' file can't find!");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"GBK"));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"utf-8"));
 		String line = "";
 		int iterator = 0;
 		while((line = reader.readLine())!=null)
 		{
 			//System.out.println(line);
 			this.stopwords.put(line, iterator++);
+			System.out.println("line"+line+"d");
 		}
 		reader.close();
 		System.out.println("停用词表加载完毕."+this.stopwords.size());
@@ -40,6 +41,7 @@ public class StopWords
 			{
 				weibo_seg.remove(i);
 				i--;
+				//System.out.println(weibo_seg.get(i));
 			}
 		}
 		return weibo_seg;

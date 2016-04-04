@@ -17,14 +17,15 @@ public class Node
 	String category_url;
 	int depth;
 	int branch;
+	int app_time;//出现次数计算权重的时候很有必要
 	double sentiment;
 	//存储子节点，暂时用这样的方式
-	ArrayList<Node> sons;
+	ArrayList<String> sons;
 	public Node(String name, String url)
 	{
 		this.category_name = name;
 		this.category_url = url;
-		this.sons = new ArrayList<Node>();
+		this.sons = new ArrayList<String>();
 		this.depth = -1;
 		this.branch = -1;
 		this.sentiment = -99;
@@ -61,11 +62,11 @@ public class Node
 	{
 		return this.category_url;
 	}
-	public void addSon(Node node)
+	public void addSon(String node)
 	{
 		this.sons.add(node);
 	}
-	public ArrayList<Node> getSons()
+	public ArrayList<String> getSons()
 	{
 		return this.sons;
 	}

@@ -41,36 +41,36 @@ public class Con_final
 	}
 	public void cal_CP(Tree_C t)
 	{
-		//计算概念的权重
-		Concept_Weight CW = new Concept_Weight();
-		Iterator it = t.getTNodes().iterator();
-		while(it.hasNext())
-		{
-			Node temp = (Node) it.next();
-			String category = temp.category_name;
-			Double sentiment = temp.getSentiment();
-			Double weight = CW.cal_Weight(category, t);
-			if(this.CP.containsKey(category))
-			{
-				double tw = this.CP.get(category);
-				this.CP.put(category, tw+sentiment*weight);
-			}
-			else this.CP.put(category, sentiment*weight);
-		}
-		//排序，方便去前K个
-		List<Map.Entry<String, Double>> fi =
-			    new ArrayList<Map.Entry<String, Double>>(CP.entrySet());
-		Collections.sort(fi, new Comparator<Map.Entry<String, Double>>() 
-		{   
-		    public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) 
-		    {      
-		        if((o2.getValue() - o1.getValue()) < 0)
-		        	return -1;
-		        else return 1;
-		        
-		        //return (o1.getKey()).toString().compareTo(o2.getKey());
-		    }
-		});
+//		//计算概念的权重
+//		Concept_Weight CW = new Concept_Weight();
+//		Iterator it = t.getTNodes().iterator();
+//		while(it.hasNext())
+//		{
+//			Node temp = (Node) it.next();
+//			String category = temp.category_name;
+//			Double sentiment = temp.getSentiment();
+//			Double weight = CW.cal_Weight(category, t);
+//			if(this.CP.containsKey(category))
+//			{
+//				double tw = this.CP.get(category);
+//				this.CP.put(category, tw+sentiment*weight);
+//			}
+//			else this.CP.put(category, sentiment*weight);
+//		}
+//		//排序，方便去前K个
+//		List<Map.Entry<String, Double>> fi =
+//			    new ArrayList<Map.Entry<String, Double>>(CP.entrySet());
+//		Collections.sort(fi, new Comparator<Map.Entry<String, Double>>() 
+//		{   
+//		    public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) 
+//		    {      
+//		        if((o2.getValue() - o1.getValue()) < 0)
+//		        	return -1;
+//		        else return 1;
+//		        
+//		        //return (o1.getKey()).toString().compareTo(o2.getKey());
+//		    }
+//		});
 	}
 
 }
