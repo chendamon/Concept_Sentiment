@@ -99,6 +99,8 @@ public class getConceptsFWT
 		//sy 存储待消气的网页
 		HashMap<String,String> sy = new HashMap<String,String>();
 		sy.clear();
+		
+		String id = null;
 		while((l = buffer.readLine()) != null)
 		{
 			
@@ -113,6 +115,12 @@ public class getConceptsFWT
 					else if(l.contains(entitys.get(i)))
 						app_time++;
 				}
+			}
+			//4/4
+			//<h1 id="firstHeading" class="firstHeading" lang="zh-CN">TFBOYS</h1>
+			if(l.contains("<h1 id="))
+			{
+				id = l.replaceAll("<h1 id=\"firstHeading\" class=\"firstHeading\" lang=\"zh-CN\">", "").replace("</h1>", "");
 			}
 			//如果根本不是实体直接返回 316已经不需要进行判断
 //			if(l.contains("mw-search-result-heading"))
@@ -256,7 +264,7 @@ public class getConceptsFWT
 			 String re = this.getSy(entitys, sy, Surls);
 			 return re;
 		 }
-		return keyword;
+		return id;
 	}
 	//近义词的情况，比如百度百科中的韦德
 	//author biront
