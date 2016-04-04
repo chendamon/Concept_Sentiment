@@ -15,17 +15,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /*
- * ÊµÑé´Ó°Ù¶È·µ»ØËÑË÷½á¹û
- * Ö÷ÒªÊÇÌ½Ë÷ÈçºÎÔÚÁ¬½ÓÉÏ¼ÓÔÚÄÚÈİ
+ * å®éªŒä»ç™¾åº¦è¿”å›æœç´¢ç»“æœ
+ * ä¸»è¦æ˜¯æ¢ç´¢å¦‚ä½•åœ¨è¿æ¥ä¸ŠåŠ åœ¨å†…å®¹
  * author biront
  * 2015/11/30
- * ÓïÒåÏûÆç»¹ÊÇĞèÒªÕû¸öÍøÒ³µÄÎÄ±¾ÄÚÈİ 
+ * è¯­ä¹‰æ¶ˆæ­§è¿˜æ˜¯éœ€è¦æ•´ä¸ªç½‘é¡µçš„æ–‡æœ¬å†…å®¹ 
  */
 public class getConceptsFWT 
 {
-	//´æ´¢Ïà½ü´ÊÌõµÄurl,ÒÔ¼°ÃèÊö
+	//å­˜å‚¨ç›¸è¿‘è¯æ¡çš„url,ä»¥åŠæè¿°
 	//2015/12/1
-	//wiki suls´æ´¢µÄÊÇcategory£ºurl
+	//wiki sulså­˜å‚¨çš„æ˜¯categoryï¼šurl
 	//HashMap<String,String> Surls;
 	int app_time;
 	public getConceptsFWT()
@@ -42,24 +42,24 @@ public class getConceptsFWT
 //	{
 //		return this.Surls;
 //	}
-	//¸ø°Ù¶È°Ù¿ÆÒ»¸öËÑË÷ÇëÇó
-	//²¢¸ù¾İ·µ»Ø½á¹ûÕÒµ½´ÊÌõ±êÇ©£¬°Ù¶ÈÕâÒ²ÊÇÓĞµÄ
-	//´ı½â¾öµÄÎÊÌâÊÇÈç¹ûËÑË÷³öÀ´ÊÇÒ»¶ÑÁĞ±í
+	//ç»™ç™¾åº¦ç™¾ç§‘ä¸€ä¸ªæœç´¢è¯·æ±‚
+	//å¹¶æ ¹æ®è¿”å›ç»“æœæ‰¾åˆ°è¯æ¡æ ‡ç­¾ï¼Œç™¾åº¦è¿™ä¹Ÿæ˜¯æœ‰çš„
+	//å¾…è§£å†³çš„é—®é¢˜æ˜¯å¦‚æœæœç´¢å‡ºæ¥æ˜¯ä¸€å †åˆ—è¡¨
 	//2015/11/30
 	//2015/12/4
-	//ÊµÌå³öÏÖ¼ÆÊıÒ²·Åµ½ÕâÀï±ß°É
-	//ÄÇĞ©Ã»ÓĞ³öÏÖµÄÊµÌå£¬»òÕß¸ù±¾²»ÊÇÊµÌåµÄÄÚÈİ
+	//å®ä½“å‡ºç°è®¡æ•°ä¹Ÿæ”¾åˆ°è¿™é‡Œè¾¹å§
+	//é‚£äº›æ²¡æœ‰å‡ºç°çš„å®ä½“ï¼Œæˆ–è€…æ ¹æœ¬ä¸æ˜¯å®ä½“çš„å†…å®¹
 	//2015/12/5
 	
-	//3.15 ÅĞ¶ÏÈç¹ûÊÇĞ¡Æø´¦ÀíµÄ»° ²»¶Ô½á¹û½øĞĞ´æ´¢
+	//3.15 åˆ¤æ–­å¦‚æœæ˜¯å°æ°”å¤„ç†çš„è¯ ä¸å¯¹ç»“æœè¿›è¡Œå­˜å‚¨
 	
-	//3¡£17·µ»ØÏûÆçºóµÄ½á¹û ¸ø³öwikipediaÖĞµÄÒ³Ãæ±êÌâ
+	//3ã€‚17è¿”å›æ¶ˆæ­§åçš„ç»“æœ ç»™å‡ºwikipediaä¸­çš„é¡µé¢æ ‡é¢˜
 	public String getReFB(String keyword,String urls,ArrayList<String> entitys, boolean is_sy) throws IOException
 	{
 		HashMap<String,String> Surls = 	new HashMap<String,String>();
 		if(urls!= null)
 			System.out.println("sons url"+urls);
-		//ÊµÌå³öÏÖ´ÎÊıµÄ¼ÆÊı±äÁ¿
+		//å®ä½“å‡ºç°æ¬¡æ•°çš„è®¡æ•°å˜é‡
 		app_time = 0;
 		ArrayList<String> Tags = new ArrayList<String>();
 		//baidu.com
@@ -68,20 +68,20 @@ public class getConceptsFWT
 		URL url = null;
 		if(urls == null)
 		{
-			//ÖĞÎÄ¸ñÊ½×ª»»
+			//ä¸­æ–‡æ ¼å¼è½¬æ¢
 			//String encode = java.net.URLEncoder.encode(keyword);
 		    url = new URL("https://zh.wikipedia.org/wiki/"+keyword);
-			//url = new URL("https://zh.wikipedia.org/wiki/Ï²»¶");
+			//url = new URL("https://zh.wikipedia.org/wiki/å–œæ¬¢");
 		    System.out.println("keyword: "+keyword+"concept url: "+url.toString());
 		}
 		else
 			url = new URL(urls);
 		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();           
-		urlcon.connect();//»ñÈ¡Á¬½Ó
+		urlcon.connect();//è·å–è¿æ¥
 		System.out.println("responsecode"+urlcon.getResponseCode());
 		
-		//ÅĞ¶Ï·µ»Ø´úÂë 3/15
-		//Èç¹û·µ»Ø´úÂë²»ÊÇ200Ö±½Ó²»¹ÜÁË
+		//åˆ¤æ–­è¿”å›ä»£ç  3/15
+		//å¦‚æœè¿”å›ä»£ç ä¸æ˜¯200ç›´æ¥ä¸ç®¡äº†
 		if(urlcon.getResponseCode() != 200)
 		{
 			return null;
@@ -96,7 +96,7 @@ public class getConceptsFWT
 		//wikipedia
 		//category get
 		//2012/12/2
-		//sy ´æ´¢´ıÏûÆøµÄÍøÒ³
+		//sy å­˜å‚¨å¾…æ¶ˆæ°”çš„ç½‘é¡µ
 		HashMap<String,String> sy = new HashMap<String,String>();
 		sy.clear();
 		
@@ -104,8 +104,8 @@ public class getConceptsFWT
 		while((l = buffer.readLine()) != null)
 		{
 			
-			//ÊµÌå³öÏÖ¼ÆÊı
-			//316 È¥µôµ±Ç°µÄÒª
+			//å®ä½“å‡ºç°è®¡æ•°
+			//316 å»æ‰å½“å‰çš„è¦
 			if(entitys != null)
 			{
 				for(int i = 0; i < entitys.size(); i++)
@@ -118,40 +118,42 @@ public class getConceptsFWT
 			}
 			//4/4
 			//<h1 id="firstHeading" class="firstHeading" lang="zh-CN">TFBOYS</h1>
+			//è¿˜æ˜¯éœ€è¦è¿›è¡Œæ­£åˆ™è¡¨è¾¾å¼çš„åŒ¹é…
 			if(l.contains("<h1 id="))
 			{
-				id = l.replaceAll("<h1 id=\"firstHeading\" class=\"firstHeading\" lang=\"zh-CN\">", "").replace("</h1>", "");
+				String regex = "<.*?>";
+			  id = l.replaceAll(regex, "");
 			}
-			//Èç¹û¸ù±¾²»ÊÇÊµÌåÖ±½Ó·µ»Ø 316ÒÑ¾­²»ĞèÒª½øĞĞÅĞ¶Ï
+			//å¦‚æœæ ¹æœ¬ä¸æ˜¯å®ä½“ç›´æ¥è¿”å› 316å·²ç»ä¸éœ€è¦è¿›è¡Œåˆ¤æ–­
 //			if(l.contains("mw-search-result-heading"))
 //				break;
-			//ÕâÀïÓĞÎÊÌâ£¡£¡£¡£¡4/4 Ö±½ÓsyÓĞÊ²Ã´ÓÃ?
+			//è¿™é‡Œæœ‰é—®é¢˜ï¼ï¼ï¼ï¼4/4 ç›´æ¥syæœ‰ä»€ä¹ˆç”¨?
 			if(l.contains("id=\"mw-content-text\"")&&!keyword.contains("Category"))
 				s_zone = true;
-			//½øĞĞÁĞ±íµÄÌáÈ¡
+			//è¿›è¡Œåˆ—è¡¨çš„æå–
 			/*
 			 * 2016/2/16
-			 *Ö±½ÓÏÈ½øĞĞtitleµÄÅĞ±ğ£¬ÒòÎªºÜ¶à²îÒ»¸ö×Ö¾Í²îºÜ¶à
+			 *ç›´æ¥å…ˆè¿›è¡Œtitleçš„åˆ¤åˆ«ï¼Œå› ä¸ºå¾ˆå¤šå·®ä¸€ä¸ªå­—å°±å·®å¾ˆå¤š
 			 */
 			if(s_zone&&l.contains("div"))
 				break;
-			else if(s_zone&&l.contains("<li><a href="))//Ìí¼ÓÒ»¸ö<li>±êÇ©µÄÅĞ±ğ£¬²»ÊÇµÄ»°ËµÃ÷ÊÇÒ»¸ö×¼È·µØÒ³Ãæ ²»ĞèÒª½øĞĞÏû³ıÆçÒå
+			else if(s_zone&&l.contains("<li><a href="))//æ·»åŠ ä¸€ä¸ª<li>æ ‡ç­¾çš„åˆ¤åˆ«ï¼Œä¸æ˜¯çš„è¯è¯´æ˜æ˜¯ä¸€ä¸ªå‡†ç¡®åœ°é¡µé¢ ä¸éœ€è¦è¿›è¡Œæ¶ˆé™¤æ­§ä¹‰
 			{
 				
-				//À©³äÕıÔò±í´ïÊ½·ñÔò»áÓĞÆäËûÂÒÆß°ËÔãµÄÄÚÈİ 3/15
-				//Ö±½Ó¶ÔÌáÈ¡µÄÁ¬½Ó¹ıÂË¾ÍĞĞÁË
+				//æ‰©å……æ­£åˆ™è¡¨è¾¾å¼å¦åˆ™ä¼šæœ‰å…¶ä»–ä¹±ä¸ƒå…«ç³Ÿçš„å†…å®¹ 3/15
+				//ç›´æ¥å¯¹æå–çš„è¿æ¥è¿‡æ»¤å°±è¡Œäº†
 				String regex ="href=.*?>";
 				Pattern p_u = Pattern.compile(regex);
 				Matcher m = p_u.matcher(l);
 				while(m.find())
 				{
 					String temp = m.group(0);
-					//ÄÚÈİ¹ıÂË
+					//å†…å®¹è¿‡æ»¤
 					if(!temp.contains(keyword))
 						continue;
 					String[] items = temp.split("\\s");
 					String category_url = "http://zh.wikipedia.org"+items[0].replace("href=", "").replaceAll("\"", "");
-					//ÕıÔò±í´ïÊ½ÌáÈ¡title
+					//æ­£åˆ™è¡¨è¾¾å¼æå–title
 					String title = "title=\".*?\"";
 					Pattern p_t = Pattern.compile(title);
 					Matcher m_t = p_t.matcher(temp);
@@ -168,7 +170,7 @@ public class getConceptsFWT
 				}
 				
 			}
-			//´æÔÚ´ıĞ¡ÆøÑ¡Ïî£¬ÇÒ³öÏÖÁËdivÖ±½ÓÉ¾
+			//å­˜åœ¨å¾…å°æ°”é€‰é¡¹ï¼Œä¸”å‡ºç°äº†divç›´æ¥åˆ 
 			if(sy.size()>0&&l.contains("div"))
 				break;
 //			else if(s_zone&&l.contains("<table"))
@@ -177,11 +179,11 @@ public class getConceptsFWT
 //			}
 			
 			//System.out.println("sy.size"+sy.size());	
-//			if(l.contains("Special:Ò³Ãæ·ÖÀà"))
+//			if(l.contains("Special:é¡µé¢åˆ†ç±»"))
 //				System.out.println("should have...........");
-//			//Ö±½ÓÊÇÒ»ĞĞËùÓĞÀà±ğ£¬Ö±½ÓÕıÔò±í´ïÊ½Æ¥Åä
+//			//ç›´æ¥æ˜¯ä¸€è¡Œæ‰€æœ‰ç±»åˆ«ï¼Œç›´æ¥æ­£åˆ™è¡¨è¾¾å¼åŒ¹é…
 //			boolean cate_zone = false;
-//			if(l.contains("Special:Ò³Ãæ·ÖÀà")&&!is_sy&&sy.size() == 0)
+//			if(l.contains("Special:é¡µé¢åˆ†ç±»")&&!is_sy&&sy.size() == 0)
 //			{
 //				cate_zone = true;
 //				System.out.println("wiki found");
@@ -197,11 +199,11 @@ public class getConceptsFWT
 //					String category_url = "http://zh.wikipedia.org"+items[0].replace("href=", "").replaceAll("\"", "");
 //					String category_dep = items[1].replace("title=\"", "").replaceAll("\">", "");
 //					
-//					//¹ıÂËµôÒ»Ğ©Ã÷ÏÔ²»Æğ×÷ÓÃµÄcategory
-//					//ÈçÊ²Ã´Ê±ºò³öÉú
-//					//¹ıÂË×îÖÕµÄÒ³Ãæ£¬¼´Ò³Ãæ·ÖÀà×ÜÒ³Ãæ
+//					//è¿‡æ»¤æ‰ä¸€äº›æ˜æ˜¾ä¸èµ·ä½œç”¨çš„category
+//					//å¦‚ä»€ä¹ˆæ—¶å€™å‡ºç”Ÿ
+//					//è¿‡æ»¤æœ€ç»ˆçš„é¡µé¢ï¼Œå³é¡µé¢åˆ†ç±»æ€»é¡µé¢
 //					//date 2015/12/9
-//					if(category_dep.contains("³öÉú")||category_dep.contains("ÔÚÊÀÈËÎï"))
+//					if(category_dep.contains("å‡ºç”Ÿ")||category_dep.contains("åœ¨ä¸–äººç‰©"))
 //						continue;
 //					System.out.println("category: "+category_dep);
 //					Surls.put(category_dep, category_url);
@@ -215,9 +217,9 @@ public class getConceptsFWT
 		//baike.baidu.com
 //		while((l=buffer.readLine())!=null)
 //		{
-//			//¶àÒå´Ê´¦ÀíÇé¿ö
+//			//å¤šä¹‰è¯å¤„ç†æƒ…å†µ
 //			//2015/12/01
-//			if(l.contains("¶àÒå´Ê"))
+//			if(l.contains("å¤šä¹‰è¯"))
 //			{
 //				s_zone = true;
 //			}
@@ -225,14 +227,14 @@ public class getConceptsFWT
 //			{
 //				
 //				String url_regex ="href=.*?</a>";
-//				//String des_regex = "£º.*?</a>";
+//				//String des_regex = "ï¼š.*?</a>";
 //				Pattern p_u = Pattern.compile(url_regex);
 //				Matcher m = p_u.matcher(l);
 //				while(m.find())
 //				{
 //					String t = m.group(0);
 //					String c_url = "www.baike.baidu.com"+t.substring(t.indexOf("\"")+1, t.lastIndexOf("\""));
-//				    String c_des = t.substring(t.indexOf(">")+1, t.lastIndexOf("<")).replaceAll(keyword+"£º", "");
+//				    String c_des = t.substring(t.indexOf(">")+1, t.lastIndexOf("<")).replaceAll(keyword+"ï¼š", "");
 //				    this.Surls.put(c_url, c_des);
 //				}
 //				if(l.contains("</ul>"))
@@ -247,7 +249,7 @@ public class getConceptsFWT
 //			{
 //				if(l.contains("div"))
 //					break;
-//				else if(!l.contains("<")&&!l.contains("£¬"))
+//				else if(!l.contains("<")&&!l.contains("ï¼Œ"))
 //					Tags.add(l);
 //			} 
 //	     }    
@@ -259,26 +261,26 @@ public class getConceptsFWT
 //		 }
 		 if(sy.size() > 1)
 		 {
-			 System.out.println("´ıÏû³ıÆçÒå²¿·Ö£º"+sy.toString());
-			 //¶ÔÆçÒå½øĞĞ´¦ÀíµÄ²¿·Ö
+			 System.out.println("å¾…æ¶ˆé™¤æ­§ä¹‰éƒ¨åˆ†ï¼š"+sy.toString());
+			 //å¯¹æ­§ä¹‰è¿›è¡Œå¤„ç†çš„éƒ¨åˆ†
 			 String re = this.getSy(entitys, sy, Surls);
 			 return re;
 		 }
 		return id;
 	}
-	//½üÒå´ÊµÄÇé¿ö£¬±ÈÈç°Ù¶È°Ù¿ÆÖĞµÄÎ¤µÂ
+	//è¿‘ä¹‰è¯çš„æƒ…å†µï¼Œæ¯”å¦‚ç™¾åº¦ç™¾ç§‘ä¸­çš„éŸ¦å¾·
 	//author biront
 	//2015/12/01
-	//ÈçºÎ´¦Àí£¿¶ÔÎ¬»ù°Ù¿Æ¶øÑÔÊÇ²»ÊÇ¿ÉÒÔÓÃinfobox¶ø²»ÊÇËùÓĞµÄÍøÒ³ÄÚÈİ£¿
-	//±àÂëµÄÄÑ¶È»¹ÊÇÓĞµÄ£¬½ñÌì°ÑËü¾¡Á¿¸ãÍê£¬ÓÃÇŞÊÒµÄÍø
+	//å¦‚ä½•å¤„ç†ï¼Ÿå¯¹ç»´åŸºç™¾ç§‘è€Œè¨€æ˜¯ä¸æ˜¯å¯ä»¥ç”¨infoboxè€Œä¸æ˜¯æ‰€æœ‰çš„ç½‘é¡µå†…å®¹ï¼Ÿ
+	//ç¼–ç çš„éš¾åº¦è¿˜æ˜¯æœ‰çš„ï¼Œä»Šå¤©æŠŠå®ƒå°½é‡æå®Œï¼Œç”¨å¯å®¤çš„ç½‘
 	//2015/12/4
-	//¾ä×ÓÖĞÆäËûÊµÌå³öÏÖµÄ´ÎÊı£¬Ö±½ÓÍ³¼Æ´ÎÊıºÃÁË
+	//å¥å­ä¸­å…¶ä»–å®ä½“å‡ºç°çš„æ¬¡æ•°ï¼Œç›´æ¥ç»Ÿè®¡æ¬¡æ•°å¥½äº†
 	public String getSy(ArrayList<String> entities,HashMap<String,String> url_title, HashMap<String,String> Surls) throws IOException
 	{
 		int max_time = -1;
 		String the_url = null;
 		String the_title = null;
-		//¿Õ¼ä»»Ê±¼äÁË£¬ÎªÁË²»½øĞĞµÚ¶ş±éÉ¨Ãè
+		//ç©ºé—´æ¢æ—¶é—´äº†ï¼Œä¸ºäº†ä¸è¿›è¡Œç¬¬äºŒéæ‰«æ
 		//HashMap<String,String> backup = new HashMap<String,String>();
 		Iterator iter = url_title.entrySet().iterator();
 		String url_max = "";
@@ -292,7 +294,7 @@ public class getConceptsFWT
 			System.out.println("new key:"+key);
 			System.out.println("new title:"+val);
 			this.getReFB(val, null, entities,true);
-			System.out.println("³öÏÖ´ÎÊı"+app_time);
+			System.out.println("å‡ºç°æ¬¡æ•°"+app_time);
 			//3.15 change
 			if(app_time >= max_time)
 			{
@@ -323,7 +325,7 @@ public class getConceptsFWT
 //			this.Surls.put(k, v);
 //		}
 		System.out.println("xiaoqi done!");
-//		System.out.println("½á¹û"+Surls.toString());
+//		System.out.println("ç»“æœ"+Surls.toString());
 		return dep_max;
 		
 	}
