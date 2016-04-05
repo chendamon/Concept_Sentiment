@@ -71,6 +71,7 @@ public class user_profile_create
 				//去停用词
 				ArrayList<String> weibo_no_stopwords = sw.rmStopW(weibo_seg);
 				ArrayList<String> weibo_no_po = this.rmPo(weibo_no_stopwords);
+				
 				//进行wiki概念树的构建
 				new_p.pipe(weibo_no_po,c_tree);
 				
@@ -80,7 +81,7 @@ public class user_profile_create
 //				this.merge(parse_total, parse_result);
 			}
 			//所有微博分词，分析模块结束
-			System.out.println(user_list[i]+"分词结果为: "+weibo_seg_total.toString());
+		//	System.out.println(user_list[i]+"分词结果为: "+weibo_seg_total.toString());
 			//System.out.println(user_list[i]+"句法分析结果为: "+parse_total.toString());
 			//entity sentimen绑定
 			Entity_Sent en_s = new Entity_Sent();
@@ -185,7 +186,9 @@ public class user_profile_create
 		for(int i = 0; i < words.size(); i++)
 		{
 			String word = words.get(i);
+			//System.out.println("word: "+word);
 			word = word.replaceAll("\\pP|\\pS", "");
+			//System.out.println("word after: "+word);
 			word = word.replaceAll(" ", "");
 			word = word.replaceAll(" ", "");
 			if(word.length() == 0)

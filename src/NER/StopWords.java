@@ -28,7 +28,7 @@ public class StopWords
 		{
 			//System.out.println(line);
 			this.stopwords.put(line, iterator++);
-			System.out.println("line"+line+"d");
+			//System.out.println("line"+line+"d");
 		}
 		reader.close();
 		System.out.println("停用词表加载完毕."+this.stopwords.size());

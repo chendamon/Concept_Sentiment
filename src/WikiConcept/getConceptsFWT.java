@@ -1,5 +1,4 @@
 package WikiConcept;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +12,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import FanJian.LangUtils;
 
 /*
  * 实验从百度返回搜索结果
@@ -118,11 +119,9 @@ public class getConceptsFWT
 			}
 			//4/4
 			//<h1 id="firstHeading" class="firstHeading" lang="zh-CN">TFBOYS</h1>
-			//还是需要进行正则表达式的匹配
 			if(l.contains("<h1 id="))
 			{
-				String regex = "<.*?>";
-			  id = l.replaceAll(regex, "");
+				id = l.replaceAll("<.*?>", "");
 			}
 			//如果根本不是实体直接返回 316已经不需要进行判断
 //			if(l.contains("mw-search-result-heading"))
@@ -135,11 +134,10 @@ public class getConceptsFWT
 			 * 2016/2/16
 			 *直接先进行title的判别，因为很多差一个字就差很多
 			 */
-			if(s_zone&&l.contains("div"))
+			else if(s_zone&&l.contains("div"))
 				break;
-			else if(s_zone&&l.contains("<li><a href="))//添加一个<li>标签的判别，不是的话说明是一个准确地页面 不需要进行消除歧义
+			else if(s_zone&&l.contains("<li>")&&l.contains("<a href"))//添加一个<li>标签的判别，不是的话说明是一个准确地页面 不需要进行消除歧义
 			{
-				
 				//扩充正则表达式否则会有其他乱七八糟的内容 3/15
 				//直接对提取的连接过滤就行了
 				String regex ="href=.*?>";
@@ -148,8 +146,11 @@ public class getConceptsFWT
 				while(m.find())
 				{
 					String temp = m.group(0);
+					System.out.println("temp"+temp);
 					//内容过滤
-					if(!temp.contains(keyword))
+					//4/5 存在繁简体不一致的问题 可能直接导致丢失有用的信息
+					//不能直接去掉，还是要进行繁简体的转化
+					if(!temp.contains(keyword)&&!this.fanjian(temp).contains(keyword))
 						continue;
 					String[] items = temp.split("\\s");
 					String category_url = "http://zh.wikipedia.org"+items[0].replace("href=", "").replaceAll("\"", "");
@@ -163,10 +164,15 @@ public class getConceptsFWT
 						String t = m_t.group(0);
 						t = t.replaceAll("title=\"", "");
 						category_dep = t.substring(0, t.length()-1);
+						//System.out.println(category_dep);
 					}
 					//String category_dep = items[1].replace("title=\"Category:", "").replaceAll("\">", "");
+					//System.out.println("category dep: "+category_dep);
 					
-					sy.put(category_url, category_dep);
+					//4.5消歧用直接将key设置为关键词，dep设置为简短的描述
+					String dep = l.replaceAll("<.*?>", "");
+					System.out.println("dep: "+dep);
+					sy.put(category_dep, dep);
 				}
 				
 			}
@@ -259,11 +265,13 @@ public class getConceptsFWT
 //			 System.out.println("we found something.");
 //			 System.out.println(Tags.toString());
 //		 }
+		 System.out.println(sy.size());
 		 if(sy.size() > 1)
 		 {
 			 System.out.println("待消除歧义部分："+sy.toString());
 			 //对歧义进行处理的部分
-			 String re = this.getSy(entitys, sy, Surls);
+			 //String re = this.getSy(entitys, sy, Surls);
+			 String re = this.Rq(entitys, sy);
 			 return re;
 		 }
 		return id;
@@ -275,6 +283,7 @@ public class getConceptsFWT
 	//编码的难度还是有的，今天把它尽量搞完，用寝室的网
 	//2015/12/4
 	//句子中其他实体出现的次数，直接统计次数好了
+	//尝试用页面描述消歧
 	public String getSy(ArrayList<String> entities,HashMap<String,String> url_title, HashMap<String,String> Surls) throws IOException
 	{
 		int max_time = -1;
@@ -326,9 +335,68 @@ public class getConceptsFWT
 //		}
 		System.out.println("xiaoqi done!");
 //		System.out.println("结果"+Surls.toString());
+		//如果结果全0，为了保证不出现歧义 直接省略好了
+		if(max_time == 0)
+			return null;
 		return dep_max;
 		
 	}
-	
+	//4/5 繁体与简体的转换
+	public String fanjian(String text)
+	{
+		if(text.length() > 6003)
+		{
+			text = text.substring(0,6001);
+			
+		}
+		char[] chs = new char[text.length()];
+		text = LangUtils.mapFullWidthLetterToHalfWidth(text);
+		text = LangUtils.mapChineseMarksToAnsi(text);
+		text = LangUtils.mapFullWidthNumberToHalfWidth(text);
+		text = LangUtils.removeEmptyLines(text);
+		text = LangUtils.removeExtraSpaces(text);
+		text = LangUtils.removeLineEnds(text);
+		int id = 0;
+		for(int i = 0; i < text.length(); i++)
+		{
+			char c = text.charAt(i);
+			if(LangUtils.isChinese(c)||((int)c > 31&&(int)c < 128))
+			{
+				chs[id] = c;
+				id++;
+			}
+		}
+		text = LangUtils.T2S(new String(chs).trim());
+		return LangUtils.replaceAnsiMarkWithSpace(text);
+	}
+	//4/5尝试使用简介里的内容进行消歧，避免一些莫名其妙的计数错误尝试一下
+	//这各部分还是存在一定的问题的  要好好想一想
+	String Rq(ArrayList<String> entities, HashMap<String,String> sy)
+	{
+		int max_time = 0;
+		String se = null;
+		Iterator iter = sy.entrySet().iterator();
+		String url_max = "";
+		String dep_max  = "";
+		while (iter.hasNext()) 
+		{
+			int count = 0;
+			Map.Entry entry = (Map.Entry) iter.next();
+			String key = (String) entry.getKey();
+			String val = (String) entry.getValue();
+			
+			for(String en:entities)
+			{
+				if(val.contains(en))
+					count++;
+			}
+			if(max_time < count)
+			{
+				max_time = count;
+				se = key;
+			}
+		}
+		return se;
+	}
 
 }
