@@ -31,13 +31,17 @@ public class Category_merge
 	java.sql.Statement stmt;
 	String sql;
 	String url;
+	ArrayList<String> cate_stop;
 	//记录从当前节点到祖先的路径的数组
 	ArrayList<String> path_a;
 	ArrayList<String> path_b;
-	public Category_merge()
+	public Category_merge() throws Exception
 	{
 		this.path_a = new ArrayList<String>();
 		this.path_b = new ArrayList<String>();
+		StopCate sc = new StopCate();
+		
+		this.cate_stop = sc.InitCstop("category_stop.txt");
 	}
 	//依旧是迭代
 	//添加父子的结构关系
@@ -266,7 +270,17 @@ public class Category_merge
 			{
 				String temp = this.InputStreamTOString(rs.getBinaryStream(1), "utf-8");
 				//System.out.println("category: "+temp);
-				if(temp.contains("含有")||temp.contains("英文")||temp.contains("包含英语")||temp.contains("Articles")||temp.contains("出生")||temp.contains("在世人物")||temp.contains("的页面")||temp.contains("条目"))
+				boolean c = false;
+				for(String ca:this.cate_stop)
+				{
+					if(temp.contains(ca))
+					{
+						c = true;
+						break;
+					}
+						
+				}
+				if(c)
 					continue;
 				category_father.add("Category:"+temp);
 				//System.out.println(temp);
@@ -291,7 +305,17 @@ public class Category_merge
 			{
 				String temp = this.InputStreamTOString(rs.getBinaryStream(1), "utf-8");
 				//System.out.println("category: "+temp);
-				if(temp.contains("含有")||temp.contains("英文")||temp.contains("包含英语")||temp.contains("Articles")||temp.contains("出生")||temp.contains("在世人物")||temp.contains("的页面")||temp.contains("条目"))
+				boolean c = false;
+				for(String ca:this.cate_stop)
+				{
+					if(temp.contains(ca))
+					{
+						c = true;
+						break;
+					}
+						
+				}
+				if(c)
 					continue;
 				category_father.add("Category:"+temp);
 			}
@@ -338,7 +362,17 @@ public class Category_merge
 					{
 						String category_dep = mn.group(0).replaceAll("\"", "");
 						//System.out.println("cate_dep:"+category_dep);
-						if(category_dep.contains("出生")||category_dep.contains("在世人物"))
+						boolean c = false;
+						for(String ca:this.cate_stop)
+						{
+							if(category_dep.contains(ca))
+							{
+								c = true;
+								break;
+							}
+								
+						}
+						if(c)
 							continue;
 						father_category.add(category_dep);
 					}

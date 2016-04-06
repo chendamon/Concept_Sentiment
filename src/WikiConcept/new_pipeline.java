@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import FanJian.Content;
+
 public class new_pipeline 
 {
 	public void pipe(ArrayList<String> ca_entities, Tree_C tree) throws Exception
@@ -18,14 +20,24 @@ public class new_pipeline
 		//System.out.println(cm.father_category_sql("Category:中国篮球运动员").toString());
 		//先进行消歧
 		ArrayList<String> wiki_title = new ArrayList<String>();
-		//wiki_title 是否需要进行模糊查询,以及返回的结果是否直接作为数据库检索的keyword 4/4
 		for(String entity:ca_entities)
 		{
 			String title = fwt.getReFB(entity, null, ca_entities, false);
 			if(title != null)
 				wiki_title.add(title);
-			System.out.println("wiki title"+wiki_title);
 		}
+		Content c = new Content();
+		//再次进行check 以消除 粉丝 四叶草 这种歧义 暂时的想法
+		for(int i = 0; i < wiki_title.size(); i++)
+		{
+			int count = c.CountWebPage(wiki_title, wiki_title.get(i));
+			if(count == 0)
+			{
+				wiki_title.remove(i);
+				i--;
+			}
+		}
+		System.out.println("final wiki_title: "+wiki_title.toString());
 		for(String title:wiki_title)
 		{
 			if(wiki_title == null)

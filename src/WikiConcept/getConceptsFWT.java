@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import FanJian.Content;
 import FanJian.LangUtils;
 
 /*
@@ -107,21 +108,24 @@ public class getConceptsFWT
 			
 			//实体出现计数
 			//316 去掉当前的要
-			if(entitys != null)
-			{
-				for(int i = 0; i < entitys.size(); i++)
-				{
-					if(entitys.get(i).equals(keyword))
-						continue;
-					else if(l.contains(entitys.get(i)))
-						app_time++;
-				}
-			}
+//			if(entitys != null)
+//			{
+//				for(int i = 0; i < entitys.size(); i++)
+//				{
+//					if(entitys.get(i).equals(keyword))
+//						continue;
+//					else if(l.contains(entitys.get(i)))
+//						app_time++;
+//				}
+//			}
 			//4/4
 			//<h1 id="firstHeading" class="firstHeading" lang="zh-CN">TFBOYS</h1>
 			if(l.contains("<h1 id="))
 			{
 				id = l.replaceAll("<.*?>", "");
+				while(id.startsWith("\t"))
+					id = id.substring(1);
+					
 			}
 			//如果根本不是实体直接返回 316已经不需要进行判断
 //			if(l.contains("mw-search-result-heading"))
@@ -172,7 +176,7 @@ public class getConceptsFWT
 					//4.5消歧用直接将key设置为关键词，dep设置为简短的描述
 					String dep = l.replaceAll("<.*?>", "");
 					System.out.println("dep: "+dep);
-					sy.put(category_dep, dep);
+					sy.put(category_dep, keyword);
 				}
 				
 			}
@@ -271,9 +275,17 @@ public class getConceptsFWT
 			 System.out.println("待消除歧义部分："+sy.toString());
 			 //对歧义进行处理的部分
 			 //String re = this.getSy(entitys, sy, Surls);
-			 String re = this.Rq(entitys, sy);
+			// String re = this.Rq(entitys, sy);
+			 String re = this.RqWebPage(entitys, sy);
 			 return re;
 		 }
+//		 else //check 基于正文的check？ 这样做不知道有没有理论依据 先尝试一下 不太可行
+//		 {
+//			 sy.put(keyword, keyword);
+//			 return this.RqWebPage(entitys, sy);
+//			 
+//		 }
+		System.out.println("id:"+id+"end");
 		return id;
 	}
 	//近义词的情况，比如百度百科中的韦德
@@ -370,7 +382,6 @@ public class getConceptsFWT
 		return LangUtils.replaceAnsiMarkWithSpace(text);
 	}
 	//4/5尝试使用简介里的内容进行消歧，避免一些莫名其妙的计数错误尝试一下
-	//这各部分还是存在一定的问题的  要好好想一想
 	String Rq(ArrayList<String> entities, HashMap<String,String> sy)
 	{
 		int max_time = 0;
@@ -397,6 +408,32 @@ public class getConceptsFWT
 			}
 		}
 		return se;
+	}
+	//4.6 正文消歧
+	String RqWebPage(ArrayList<String> entities, HashMap<String,String> sy) throws IOException
+	{
+		Content con = new Content();
+		int max_time = 0;
+		String se = null;
+		Iterator iter = sy.entrySet().iterator();
+		String url_max = "";
+		String dep_max  = "";
+		while (iter.hasNext()) 
+		{
+			Map.Entry entry = (Map.Entry) iter.next();
+			String key = (String) entry.getKey();
+			String val = (String) entry.getValue();
+			int count = con.CountWebPage(entities, val);
+			System.out.println("key: "+key+"count: "+count);
+			if(max_time < count)
+			{
+				max_time = count;
+				se = key;
+			}
+		}
+		return se;
+		
+		
 	}
 
 }
