@@ -15,28 +15,32 @@ import java.util.regex.Pattern;
  */
 public class Sentiment_parse_pathch 
 {
-	HashMap<String,String> p_map;
-	HashMap<String,String> n_map;
+	ArrayList<String> p_map;
+	ArrayList<String> n_map;
 	public Sentiment_parse_pathch()
 	{
-		this.p_map = new HashMap<String,String>();
-		this.n_map = new HashMap<String,String>();
+		this.p_map = new ArrayList<String>();
+		this.n_map = new ArrayList<String>();
 	}
 	//把parse的结果进行转换形式，转成hashmap
 	//[nsubj(棒-4, 权力的游戏-1), advmod(棒-4, 简直-2), advmod(棒-4, 太-3), root(ROOT-0, 棒-4), dep(棒-4, 了-5)]
+	//[群 粉丝] [群 强大]
 	public void Init(ArrayList<String> parse_re)
 	{
 		int size = parse_re.size();
 		for(int i = 0; i < size; i++)
 		{
 			String temp = parse_re.get(i);
+			System.out.println(temp);
 			String fi = null;
 			String f_r = "\\(.*?-";
 			Pattern p_u = Pattern.compile(f_r);
 			Matcher m = p_u.matcher(temp);
 			while(m.find())
 			{
-				fi = m.group(0).replaceAll("(", "").replaceAll("-", "");
+				fi = m.group(0);
+				fi = fi.substring(1, fi.length()-1);
+				//System.out.println("fi:" +fi);
 			}
 			f_r = ",.*?-";
 			p_u = Pattern.compile(f_r);
@@ -44,10 +48,12 @@ public class Sentiment_parse_pathch
 			String se = null;
 			while(m.find())
 			{
-				se = m.group(0).replaceAll(",", "").replaceAll("-", "").replaceAll("\\s", "");
+				se = m.group(0);
+				se = se.substring(2, se.length()-1);
+				//System.out.println("se:"+se);
 			}
-			this.p_map.put(fi, se);
-			this.n_map.put(se, fi);
+			p_map.add(fi);
+			n_map.add(se);
 		}
 		//return pm;
 	}
@@ -62,26 +68,54 @@ public class Sentiment_parse_pathch
 	}
 	//针对一个entity 进行查找
 	//马丹，这个是双向的，难道我要用两个map？
-	public int eword_find(String entity, ArrayList<String> parse_re, HashMap<String,Integer> p, HashMap<String,Integer> n)
+	public int eword_find(String entity, HashMap<String,Integer> p, HashMap<String,Integer> n, HashMap<String,Integer> scaned)
 	{
-		HashMap<String,Integer> scaned = new HashMap<String,Integer>();//记录已经看过的词，避免环路 的出现
-		while(true)
+		System.out.println("sentiment"+entity);
+		//HashMap<String,Integer> scaned = new HashMap<String,Integer>();//记录已经看过的词，避免环路 的出现
+		scaned.put(entity, 0);
+		double sentiment = 0.0;
+		int s = 0;
+		if(this.p_map.indexOf(entity)!=-1)
 		{
-			if(this.p_map.containsKey(entity))
-				entity = this.p_map.get(entity);
-			else entity = this.n_map.get(entity);
-			
-			if(scaned.containsKey(entity))
-				break;
-			scaned.put(entity, 0);
-			
-			int e = this.is_eword(entity, p, n);
-			if(e != 0)
-				return e;
-			else if(entity.contains("ROOT"))
-				return 0;
-				
+			for(int i = 0; i < this.p_map.size(); i++)
+			{
+				if(this.p_map.get(i).equals(entity))
+				{
+					if(scaned.containsKey(this.n_map.get(i)))
+						continue;
+					else if(this.n_map.get(i).contains("ROOT"))
+						return 0;
+					else if((s = this.is_eword(this.n_map.get(i), p, n)) != 0)
+					{
+						System.out.println("sentiment"+this.n_map.get(i));
+						return s;
+					}
+					else 
+						return this.eword_find(this.n_map.get(i), p,n,scaned);
+				}
+			}
 		}
+		else if(this.n_map.indexOf(entity)!=-1)
+		{
+			for(int i = 0; i < this.n_map.size(); i++)
+			{
+				if(this.n_map.get(i).equals(entity))
+				{
+					if(scaned.containsKey(this.p_map.get(i)))
+						continue;
+					else if(this.p_map.get(i).contains("ROOT"))
+						return 0;
+					else if((s = this.is_eword(this.p_map.get(i), p, n)) != 0)
+					{
+						System.out.println("sentiment"+this.p_map.get(i));
+						return s;
+					}
+					else 
+						return this.eword_find(this.p_map.get(i), p,n,scaned);
+				}
+			}
+		}
+		
 		return 0;
 	}
 

@@ -65,7 +65,7 @@ public class Content
 			for(String en:entities)
 				if(context.contains(en)&&!en.equals(keyword))
 				{
-					System.out.println("entity: "+en);
+					//System.out.println("entity: "+en);
 					count++;
 				}
 		}

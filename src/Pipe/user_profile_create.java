@@ -16,7 +16,9 @@ import NER.StopWords;
 import NER.URLdrop;
 import NER.jieba_seg;
 import Sentiment.Parse;
+import Sentiment.Sent_enti;
 import WikiConcept.Con_final;
+import WikiConcept.Sentiment_parse_pathch;
 import WikiConcept.Tree_C;
 import WikiConcept.new_pipeline;
 
@@ -28,12 +30,19 @@ import WikiConcept.new_pipeline;
 public class user_profile_create 
 {
 	//主控函数
-	void crush_it() throws Exception
+	void crush_it(int number) throws Exception
 	{
 		//获得用户列表
 		String[] user_list = this.get_user_list("active_user");
 		System.out.println("user_list read done.");
 		int length = user_list.length;
+		
+		//情感词表的初始化
+		
+		Sent_enti sentiment_table = new Sent_enti();
+		sentiment_table.Init();
+		HashMap<String,Integer> p = sentiment_table.getP();
+		HashMap<String,Integer> n = sentiment_table.getN();
 		//循环的时候，如果直接对用户所有微博同时进行处理可能会有问题，主要是parse
 		//出现不对的依存关系
 		//加\n尝试一下 失败
@@ -57,6 +66,7 @@ public class user_profile_create
 			
 			Tree_C c_tree = new Tree_C();
 			new_pipeline new_p = new new_pipeline();
+			int count = 0;
 			for(int j = 0; j < weibo_size; j++)
 			{
 				//去除URL 换到微博提取的部分进行
@@ -72,10 +82,17 @@ public class user_profile_create
 				ArrayList<String> weibo_no_stopwords = sw.rmStopW(weibo_seg);
 				ArrayList<String> weibo_no_po = this.rmPo(weibo_no_stopwords);
 				
-				//进行wiki概念树的构建
-				new_p.pipe(weibo_no_po,c_tree);
 				
-				break;
+				
+				//进行wiki概念树的构建
+				//干脆直接先把所有词的情感词找好，然后再传参数进去，避免多次计算
+				//不行 因为 tfboys TFBOYS的情况存在 drop it
+				//HashMap<String,Integer> entity_senti = this.map_e_sentiment(weibo_no_po, parse_result, p, n);
+				new_p.pipe(weibo_no_po,c_tree,parse_result,p,n);
+				
+				count++;
+				if(count == number)
+					break;
 				//进行merge
 //				this.merge(weibo_seg_total, weibo_no_po);
 //				this.merge(parse_total, parse_result);
@@ -199,6 +216,7 @@ public class user_profile_create
 		}
 		return words;
 	}
+	
 	
 	
 

@@ -45,7 +45,7 @@ public class Category_merge
 	}
 	//依旧是迭代
 	//添加父子的结构关系
-	public void c_merge(Tree_C tree, String cate_b, int depth, ArrayList<String> entities) throws Exception
+	public void c_merge(Tree_C tree, String cate_b, int depth, ArrayList<String> entities, HashMap<String,Integer> entity_senti) throws Exception
 	{
 		//检查是不是已经包含了此类别
 		//计数加1!!!!
@@ -72,6 +72,8 @@ public class Category_merge
 				System.out.println("t_a_t"+t);
 				dep_count++;
 				Node te = new Node(t,null);
+				int sentiment = entity_senti.get(t);
+				te.sentiment = (double)sentiment;
 				te.depth = tree.max_depth+dep_count;
 				te.addSon(son);
 				son = t;
@@ -95,6 +97,8 @@ public class Category_merge
 					continue;
 				
 				Node te = new Node(t,null);
+				int sentiment = entity_senti.get(t);
+				te.sentiment = (double)sentiment;
 				te.depth = dep_count;
 				te.addSon(son);
 				son = t;
@@ -132,6 +136,8 @@ public class Category_merge
 							if(name.equals(temp_name))
 								continue;
 							Node t = new Node(name,null);
+							int sentiment = entity_senti.get(t);
+							t.sentiment = (double)sentiment;
 							t.depth = depth-dep_count;
 							tree.nodes.put(t, depth-dep_count);
 							System.out.println("new node"+name);
@@ -145,7 +151,7 @@ public class Category_merge
 			}
 			
 			System.out.println("next level");
-			this.c_merge(tree, cate_b, depth+1, entities);
+			this.c_merge(tree, cate_b, depth+1, entities, entity_senti);
 			
 	    }
 		

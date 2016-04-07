@@ -33,10 +33,15 @@ public class Sent_enti
 		{
 			if(line.length() == 0)
 				continue;
-			else if(type == 0)
-				this.pos_s.put(line,0);
 			else
-				this.neg_s.put(line,1);
+			{
+				line = line.substring(0,line.length()-1);
+				//System.out.println("line"+line+"end");
+				if(type == 0)
+					this.pos_s.put(line,0);
+				else
+					this.neg_s.put(line,1);
+			}
 		}
 		reader.close();
 	}
@@ -52,7 +57,14 @@ public class Sent_enti
 		
 		System.out.println("情感词加载完毕,pos: "+this.pos_s.size()+";neg: "+this.neg_s.size());
 	}
-	
+	public HashMap<String,Integer> getP()
+	{
+		return this.pos_s;
+	}
+	public HashMap<String,Integer> getN()
+	{
+		return this.neg_s;
+	}
 	//计算每个实体的打分
 	public int entity_SP(String entity,ArrayList<String> parse)
 	{
