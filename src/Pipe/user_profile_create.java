@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import NER.Entity_Sent;
 import NER.StopWords;
@@ -20,6 +21,7 @@ import Sentiment.Sent_enti;
 import WikiConcept.Con_final;
 import WikiConcept.Sentiment_parse_pathch;
 import WikiConcept.Tree_C;
+import WikiConcept.Tree_Processing;
 import WikiConcept.new_pipeline;
 
 /*
@@ -101,11 +103,20 @@ public class user_profile_create
 		//	System.out.println(user_list[i]+"分词结果为: "+weibo_seg_total.toString());
 			//System.out.println(user_list[i]+"句法分析结果为: "+parse_total.toString());
 			//entity sentimen绑定
-			Entity_Sent en_s = new Entity_Sent();
+			//Entity_Sent en_s = new Entity_Sent();
 			//HashMap<String,Integer> eS = en_s.gule(weibo_seg_total, parse_total);
 			//3 30还是有问题这个地方，之后用后边的patch
 			
 			//进行用户profile的构建
+			//4.8 概念树权重的计算
+			Tree_Processing tp = new Tree_Processing();
+			tp.Tree_propagate(c_tree);
+			Con_final cf = new Con_final();
+			cf.cal_CP(c_tree, tp);
+			int size = c_tree.getTNodes().size();
+			HashMap<String,Double[]> concept_result = cf.getTopK(size);
+			this.C2File(concept_result);
+			
 			
 			
 			
@@ -216,7 +227,23 @@ public class user_profile_create
 		}
 		return words;
 	}
-	
+	//4.8 将profile结果写入文档或者打印出来
+	void C2File(HashMap<String,Double[]> result)
+	{
+		HashMap<String,Double[]> top_k = new HashMap<String,Double[]>();
+		int count = 0;
+		Iterator iter = result.entrySet().iterator();
+		while (iter.hasNext()) 
+		{
+			Map.Entry entry = (Map.Entry) iter.next();
+			String key = (String) entry.getKey();
+			Double[] val = (Double[]) entry.getValue();
+			System.out.print(key+":"+val[0]+","+val[1]+"\t");
+			
+		}
+		System.out.println("\n");
+		
+	}
 	
 	
 

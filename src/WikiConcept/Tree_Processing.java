@@ -45,7 +45,7 @@ public class Tree_Processing
 				count++;
 			}
 			t_n.app_time = app_time;
-			t_n.sentiment = sentiment/count;// 需不需要重新弄？
+			t_n.sentiment = sentiment/(double)count;// 需不需要重新弄？
 		}
 	}
 	public Node IR_byname(Tree_C tree, String name)
@@ -55,7 +55,7 @@ public class Tree_Processing
 		{
 			Map.Entry entry = (Map.Entry) iter.next();
 	        Node node_temp = (Node) entry.getKey();
-	        if(node_temp.equals(name))
+	        if(node_temp.getName().equals(name))
 	        {
 	        	return node_temp;
 	        }
@@ -67,10 +67,12 @@ public class Tree_Processing
 	//depth sons
 	public double Rank(String category, Tree_C tree)
 	{
+		
 		Node node = this.IR_byname(tree, category);
 		int fre = node.app_time;
+		System.out.println("rank: "+category+" apptime: "+fre);
 		int depth = node.depth;
-		int bra = node.sons.size();
+		int bra = node.sons.size()+1;//确保非0
 		
 		double rank = fre*(1/Math.pow(bra, depth));
 		return rank;

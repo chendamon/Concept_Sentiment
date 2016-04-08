@@ -40,10 +40,11 @@ public class new_pipeline
 		
 		Content c = new Content();
 		//再次进行check 以消除 粉丝 四叶草 这种歧义 暂时的想法
+		//这里要进行title的过滤 而不是最开始的关键词 4.8
 		for(int i = 0; i < wiki_title.size(); i++)
 		{
 			int count = c.CountWebPage(wiki_title, wiki_title.get(i));
-			if(count == 0)
+			if(count < 3)//也只是权宜之计
 			{
 				wiki_title.remove(i);
 				i--;
@@ -64,6 +65,7 @@ public class new_pipeline
 					int senti = es_map.get(title);
 					Node leaf = new Node(title,null);
 					leaf.sentiment = (double)senti;
+					leaf.app_time = 1;
 					tree.nodes.put(leaf, 0);
 					tree.max_depth = 0;
 					tree.top = leaf;
