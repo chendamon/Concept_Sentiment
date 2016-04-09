@@ -72,8 +72,16 @@ public class Category_merge
 				System.out.println("t_a_t"+t);
 				dep_count++;
 				Node te = new Node(t,null);
-				int sentiment = entity_senti.get(t);
-				te.sentiment = (double)sentiment;
+				//判断是否为category，然后加上apptime
+				if(!t.contains("Category"))
+				{
+					te.app_time = 1;
+				}
+				if(entity_senti.containsKey(t))
+				{
+					int sentiment = entity_senti.get(t);
+					te.sentiment = (double)sentiment;
+				}
 				te.depth = tree.max_depth+dep_count;
 				te.addSon(son);
 				son = t;
@@ -97,8 +105,15 @@ public class Category_merge
 					continue;
 				
 				Node te = new Node(t,null);
-				int sentiment = entity_senti.get(t);
-				te.sentiment = (double)sentiment;
+				if(!t.contains("Category"))
+				{
+					te.app_time = 1;
+				}
+				if(entity_senti.containsKey(t))
+				{
+					int sentiment = entity_senti.get(t);
+					te.sentiment = (double)sentiment;
+				}
 				te.depth = dep_count;
 				te.addSon(son);
 				son = t;
@@ -136,8 +151,15 @@ public class Category_merge
 							if(name.equals(temp_name))
 								continue;
 							Node t = new Node(name,null);
-							int sentiment = entity_senti.get(t);
-							t.sentiment = (double)sentiment;
+							if(!name.contains("Category"))
+							{
+								t.app_time = 1;
+							}
+							if(entity_senti.containsKey(name))
+							{
+								int sentiment = entity_senti.get(name);
+								t.sentiment = (double)sentiment;
+							}
 							t.depth = depth-dep_count;
 							tree.nodes.put(t, depth-dep_count);
 							System.out.println("new node"+name);

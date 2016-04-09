@@ -87,7 +87,7 @@ public class Sentiment_parse_pathch
 						return 0;
 					else if((s = this.is_eword(this.n_map.get(i), p, n)) != 0)
 					{
-						System.out.println("sentiment"+this.n_map.get(i));
+						//System.out.println("sentiment"+this.n_map.get(i));
 						return s;
 					}
 					else 
@@ -107,7 +107,7 @@ public class Sentiment_parse_pathch
 						return 0;
 					else if((s = this.is_eword(this.p_map.get(i), p, n)) != 0)
 					{
-						System.out.println("sentiment"+this.p_map.get(i));
+						//System.out.println("sentiment"+this.p_map.get(i));
 						return s;
 					}
 					else 

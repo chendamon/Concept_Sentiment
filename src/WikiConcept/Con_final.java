@@ -68,6 +68,8 @@ public class Con_final
 		    {      
 		        if((o2.getValue()[0] - o1.getValue()[0]) < 0)
 		        	return -1;
+		        else if(o2.getValue()[0] == o1.getValue()[0])
+		        	return 0;
 		        else return 1;
 		        
 		        //return (o1.getKey()).toString().compareTo(o2.getKey());

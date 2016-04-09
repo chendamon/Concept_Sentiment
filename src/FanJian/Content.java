@@ -23,7 +23,7 @@ public class Content
 		{
 			return null;
 		}
-		System.out.println("get connection...");
+		//System.out.println("get connection...");
 		InputStream is = urlcon.getInputStream(); 
 		BufferedReader buffer = new BufferedReader(new InputStreamReader(is,"utf-8"));    
 		String l = null;
@@ -65,7 +65,7 @@ public class Content
 			for(String en:entities)
 				if(context.contains(en)&&!en.equals(keyword))
 				{
-					System.out.println("entity: "+en);
+					//System.out.println("entity: "+en);
 					count++;
 				}
 		}

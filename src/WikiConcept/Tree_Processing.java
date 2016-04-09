@@ -35,14 +35,17 @@ public class Tree_Processing
 			double sentiment = 0;
 			int count = 0;
 			ArrayList<String> sons = t_n.sons;
-			for(String son:sons)
+			if(sons.size() > 0)
 			{
-				Node son_temp = this.IR_byname(tree, son);
-				if(son_temp != null&&(son_temp.app_time == 0))//情感的初始化
-					this.process_Node(tree, son);
-				app_time += son_temp.app_time;
-			    sentiment += son_temp.sentiment;
-				count++;
+				for(String son:sons)
+				{
+					Node son_temp = this.IR_byname(tree, son);
+					if(son_temp != null&&(son_temp.app_time == 0))//情感的初始化
+						this.process_Node(tree, son);
+					app_time += son_temp.app_time;
+				    sentiment += son_temp.sentiment;
+					count++;
+				}
 			}
 			t_n.app_time = app_time;
 			t_n.sentiment = sentiment/(double)count;// 需不需要重新弄？

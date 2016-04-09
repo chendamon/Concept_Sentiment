@@ -79,7 +79,14 @@ public class getConceptsFWT
 		else
 			url = new URL(urls);
 		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();           
-		urlcon.connect();//获取连接
+		try {
+			urlcon.connect();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			//重新连接
+			urlcon.connect();
+		}//获取连接
 		System.out.println("responsecode"+urlcon.getResponseCode());
 		
 		//判断返回代码 3/15
