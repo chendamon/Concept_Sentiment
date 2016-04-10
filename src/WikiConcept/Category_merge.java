@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
  * 合并两个wikipedia概念，找到概念的最小公共father
  * 算法思路：
  * 由底向上的扩充
+ * 
+ * 4.10 没有进行son的添加
  */
 public class Category_merge 
 {
@@ -72,6 +74,16 @@ public class Category_merge
 				System.out.println("t_a_t"+t);
 				dep_count++;
 				Node te = new Node(t,null);
+				//添加sons
+				if(i == a_size-1)
+				{
+					te.sons.add(top.getName());
+				}
+				else
+				{
+					te.sons.add(this.path_a.get(i+1));
+				}
+				
 				//判断是否为category，然后加上apptime
 				if(!t.contains("Category"))
 				{
@@ -105,6 +117,16 @@ public class Category_merge
 					continue;
 				
 				Node te = new Node(t,null);
+				//添加sons
+				if(i == a_size-1)
+				{
+					te.sons.add(top.getName());
+				}
+				else
+				{
+					te.sons.add(this.path_a.get(i+1));
+				}
+				
 				if(!t.contains("Category"))
 				{
 					te.app_time = 1;
@@ -145,12 +167,19 @@ public class Category_merge
 					if(as.equals(temp.getName()))//说明temp是父节点，进行添加，负责直接下一层
 					{
 						int dep_count = 0;
-						for(String name:this.path_b)
+						for(int i = 0; i < this.path_b.size() ; i++)
 						{
+							String name = this.path_b.get(i);
 							dep_count++;
 							if(name.equals(temp_name))
 								continue;
 							Node t = new Node(name,null);
+							if(i > 0)
+								t.sons.add(this.path_b.get(i-1));
+							if(i == this.path_b.size() - 1)
+							{
+								temp.sons.add(name);
+							}
 							if(!name.contains("Category"))
 							{
 								t.app_time = 1;
@@ -164,6 +193,7 @@ public class Category_merge
 							tree.nodes.put(t, depth-dep_count);
 							System.out.println("new node"+name);
 						}
+						
 						System.out.println("#############");
 						System.out.println(tree.toString());
 						System.out.println("#############");

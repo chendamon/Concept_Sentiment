@@ -107,6 +107,7 @@ public class user_profile_create
 			//HashMap<String,Integer> eS = en_s.gule(weibo_seg_total, parse_total);
 			//3 30还是有问题这个地方，之后用后边的patch
 			
+			System.out.println(c_tree.toString());
 			//进行用户profile的构建
 			//4.8 概念树权重的计算
 			Tree_Processing tp = new Tree_Processing();

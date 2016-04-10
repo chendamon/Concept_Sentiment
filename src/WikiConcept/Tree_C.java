@@ -70,7 +70,9 @@ public class Tree_C
 				Node temp = entry.getKey();
 				int de = entry.getValue();
 				if(de == i)
-					line += temp.getName()+"\t"+temp.getSentiment();
+				{
+					line += temp.getName()+"\t"+temp.getSentiment()+"\nsons: "+temp.sons.toString();
+				}
 			}
 		}
 		return line;
