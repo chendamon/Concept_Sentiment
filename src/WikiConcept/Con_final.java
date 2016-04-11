@@ -22,9 +22,11 @@ public class Con_final
 		this.CP = new HashMap<String,Double[]>();
 	}
 	//返回前k个值
-	public HashMap<String,Double[]> getTopK(int k)
+	//4.11 重写
+	public ArrayList<Point> getTopK(int k)
 	{
-		HashMap<String,Double[]> top_k = new HashMap<String,Double[]>();
+		ArrayList<Point> points = new ArrayList<Point>();
+		
 		int count = 0;
 		Iterator iter = CP.entrySet().iterator();
 		while (iter.hasNext()) 
@@ -32,12 +34,25 @@ public class Con_final
 			Map.Entry entry = (Map.Entry) iter.next();
 			String key = (String) entry.getKey();
 			Double[] val = (Double[]) entry.getValue();
-			top_k.put(key, val);
+			points.add(new Point(key,val[0],val[1]));
 			count++;
 			if(count == k)
 				break;
 		}
-		return top_k;	
+		//进行排序
+		Comparator<Point> comparator = new Comparator<Point>()
+		{
+			public int compare(Point s1, Point s2) 
+			{
+				if(s1.weight-s2.weight < 0)
+					return 1;
+				else if(s1.weight-s2.weight == 0)
+					return -1;
+				else return 0;
+			}
+		};
+		Collections.sort(points,comparator);
+		return points;	
 	}
 	//4.8 计算每个概念的权重
 	public void cal_CP(Tree_C t, Tree_Processing tp)
@@ -59,22 +74,6 @@ public class Con_final
 			d[1] = sentiment;
 			this.CP.put(category, d);
 		}
-		//排序，方便去前K个
-		List<Map.Entry<String, Double[]>> fi =
-			    new ArrayList<Map.Entry<String, Double[]>>(CP.entrySet());
-		Collections.sort(fi, new Comparator<Map.Entry<String, Double[]>>() 
-		{   
-		    public int compare(Map.Entry<String, Double[]> o1, Map.Entry<String, Double[]> o2) 
-		    {      
-		        if((o2.getValue()[0] - o1.getValue()[0]) < 0)
-		        	return -1;
-		        else if(o2.getValue()[0] - o1.getValue()[0] == 0)
-		        	return 0;
-		        else return 1;
-		        
-		        //return (o1.getKey()).toString().compareTo(o2.getKey());
-		    }
-		});
 	}
 
 }

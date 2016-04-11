@@ -41,7 +41,13 @@ public class Content
 		String context = null;
 		URL url = new URL("https://zh.wikipedia.org/wiki/"+keyword);
 		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();           
-		urlcon.connect();//获取连接
+		try {
+			urlcon.connect();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			urlcon.connect();
+		}//获取连接
 		//System.out.println("responsecode"+urlcon.getResponseCode());
 		
 		if(urlcon.getResponseCode() != 200)

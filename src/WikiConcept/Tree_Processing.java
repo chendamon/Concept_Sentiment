@@ -11,19 +11,21 @@ public class Tree_Processing
 	//次数以及情感的传播
 	public Tree_C Tree_propagate(Tree_C tree)
 	{
-		Iterator iter = tree.nodes.entrySet().iterator();
-		while (iter.hasNext()) 
-		{
-			Map.Entry entry = (Map.Entry) iter.next();
-	        Node node_temp = (Node) entry.getKey();
-	        int depth = (int) entry.getValue();
-	        
-	        if(node_temp.sons.size() > 0&&node_temp.app_time == 0)
-	        {
-	        	this.process_Node(tree, node_temp.getName());
-	        }
-	        
-	    }
+//		Iterator iter = tree.nodes.entrySet().iterator();
+//		while (iter.hasNext()) 
+//		{
+//			Map.Entry entry = (Map.Entry) iter.next();
+//	        Node node_temp = (Node) entry.getKey();
+//	        int depth = (int) entry.getValue();
+//	        
+//	        if(node_temp.sons.size() > 0&&node_temp.app_time == 0)
+//	        {
+//	        	this.process_Node(tree, node_temp.getName());
+//	        }
+//	        
+//	    }
+		String top_name = tree.top.category_name;
+		this.process_Node(tree, top_name);
 		return tree;
 	}
 	public void process_Node(Tree_C tree, String name)
@@ -48,7 +50,9 @@ public class Tree_Processing
 				}
 			}
 			t_n.app_time = app_time;
-			t_n.sentiment = sentiment/(double)count;// 需不需要重新弄？
+			if(count != 0)
+				t_n.sentiment = sentiment/(double)count;// 需不需要重新弄？
+			else t_n.sentiment = 0.0;
 		}
 	}
 	public Node IR_byname(Tree_C tree, String name)

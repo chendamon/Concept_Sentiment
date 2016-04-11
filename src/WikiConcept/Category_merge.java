@@ -75,7 +75,7 @@ public class Category_merge
 				dep_count++;
 				Node te = new Node(t,null);
 				//添加sons
-				if(i == a_size-1)
+				if(i == a_size-2)
 				{
 					te.sons.add(top.getName());
 				}
@@ -95,8 +95,7 @@ public class Category_merge
 					te.sentiment = (double)sentiment;
 				}
 				te.depth = tree.max_depth+dep_count;
-				te.addSon(son);
-				son = t;
+				
 				//更新最高层的节点
 				if(t.equals(mu_as))
 					tree.top = te;
@@ -106,6 +105,8 @@ public class Category_merge
 			tree.max_depth += dep_count; //1
 			System.out.println("max_depth"+tree.max_depth);
 			
+			//更新top的值
+			top = tree.top;
 			dep_count = 0;
 			son = cate_b;
 			int b_size = this.path_b.size();
@@ -114,17 +115,17 @@ public class Category_merge
 				String t = this.path_b.get(i);
 				System.out.println("t_b_t"+t);
 				if(t.equals(mu_as))
+				{
+					top.sons.add(this.path_b.get(i+1));
 					continue;
+				}
+					
 				
 				Node te = new Node(t,null);
 				//添加sons
-				if(i == a_size-1)
+				if(i < b_size-1)
 				{
-					te.sons.add(top.getName());
-				}
-				else
-				{
-					te.sons.add(this.path_a.get(i+1));
+					te.sons.add(this.path_b.get(i+1));
 				}
 				
 				if(!t.contains("Category"))
@@ -137,8 +138,7 @@ public class Category_merge
 					te.sentiment = (double)sentiment;
 				}
 				te.depth = dep_count;
-				te.addSon(son);
-				son = t;
+				
 				tree.nodes.put(te, dep_count);
 				dep_count++;
 			}
@@ -174,9 +174,9 @@ public class Category_merge
 							if(name.equals(temp_name))
 								continue;
 							Node t = new Node(name,null);
-							if(i > 0)
-								t.sons.add(this.path_b.get(i-1));
-							if(i == this.path_b.size() - 1)
+							if(i < this.path_b.size()-1&&i>0)
+								t.sons.add(this.path_b.get(i+1));
+							if(i == 1)
 							{
 								temp.sons.add(name);
 							}

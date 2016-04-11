@@ -18,7 +18,9 @@ import NER.URLdrop;
 import NER.jieba_seg;
 import Sentiment.Parse;
 import Sentiment.Sent_enti;
+import WikiConcept.Category_merge;
 import WikiConcept.Con_final;
+import WikiConcept.Point;
 import WikiConcept.Sentiment_parse_pathch;
 import WikiConcept.Tree_C;
 import WikiConcept.Tree_Processing;
@@ -39,12 +41,20 @@ public class user_profile_create
 		System.out.println("user_list read done.");
 		int length = user_list.length;
 		
-		//情感词表的初始化
+		//情感词表，分词系统，停用词表的初始化
+		StopWords sw = new StopWords();
+		Parse par = new Parse();
+		par.Init();
+		sw.Init("stopwords.txt");//stopword file path
 		
 		Sent_enti sentiment_table = new Sent_enti();
 		sentiment_table.Init();
 		HashMap<String,Integer> p = sentiment_table.getP();
 		HashMap<String,Integer> n = sentiment_table.getN();
+		//数据库初始化
+		Category_merge cm = new Category_merge();
+		cm.Init();//后面记得close
+		
 		//循环的时候，如果直接对用户所有微博同时进行处理可能会有问题，主要是parse
 		//出现不对的依存关系
 		//加\n尝试一下 失败
@@ -57,10 +67,6 @@ public class user_profile_create
 			System.out.println("user "+user_list[i]+" weibo read done.");
 			int weibo_size = weibo_content.size();
 			jieba_seg seg = new jieba_seg();
-			StopWords sw = new StopWords();
-			Parse par = new Parse();
-			par.Init();
-			sw.Init("stopwords.txt");//stopword file path
 			ArrayList<String> weibo_seg_total = new ArrayList<String>();//整合微博分词结果
 			ArrayList<String> parse_total = new ArrayList<String>();//整合句法分析结果
 			
@@ -71,6 +77,7 @@ public class user_profile_create
 			int count = 0;
 			for(int j = 0; j < weibo_size; j++)
 			{
+				System.out.println("Now processing the "+j+" weibo of user "+i);
 				//去除URL 换到微博提取的部分进行
 	//			URLdrop url_drop = new URLdrop();
 	//			String weibo_no_url = url_drop.url_drop(weibo_content);
@@ -90,7 +97,7 @@ public class user_profile_create
 				//干脆直接先把所有词的情感词找好，然后再传参数进去，避免多次计算
 				//不行 因为 tfboys TFBOYS的情况存在 drop it
 				//HashMap<String,Integer> entity_senti = this.map_e_sentiment(weibo_no_po, parse_result, p, n);
-				new_p.pipe(weibo_no_po,c_tree,parse_result,p,n);
+				new_p.pipe(weibo_no_po,c_tree,parse_result,p,n,cm);
 				
 				count++;
 				if(count == number)
@@ -115,7 +122,7 @@ public class user_profile_create
 			Con_final cf = new Con_final();
 			cf.cal_CP(c_tree, tp);
 			int size = c_tree.getTNodes().size();
-			HashMap<String,Double[]> concept_result = cf.getTopK(size);
+			ArrayList<Point> concept_result = cf.getTopK(size);
 			this.C2File(concept_result);
 			
 			
@@ -159,6 +166,7 @@ public class user_profile_create
 //			writer.close();
 			
 		}
+		cm.close();//关闭数据库连接
 		
 	}
 	//返回用户列表
@@ -229,18 +237,13 @@ public class user_profile_create
 		return words;
 	}
 	//4.8 将profile结果写入文档或者打印出来
-	void C2File(HashMap<String,Double[]> result)
+	void C2File(ArrayList<Point> result)
 	{
-		HashMap<String,Double[]> top_k = new HashMap<String,Double[]>();
-		int count = 0;
-		Iterator iter = result.entrySet().iterator();
-		while (iter.hasNext()) 
+		int size = result.size();
+		for(int i = 0; i < size; i++ )
 		{
-			Map.Entry entry = (Map.Entry) iter.next();
-			String key = (String) entry.getKey();
-			Double[] val = (Double[]) entry.getValue();
-			System.out.print(key+":"+val[0]+","+val[1]+"\t");
-			
+			Point temp = result.get(i);
+			System.out.print(temp.getName()+":"+temp.getWeight()+","+temp.getSen()+"\t");
 		}
 		System.out.println("\n");
 		

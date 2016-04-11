@@ -71,7 +71,7 @@ public class Tree_C
 				int de = entry.getValue();
 				if(de == i)
 				{
-					line += temp.getName()+"\t"+temp.getSentiment()+"\nsons: "+temp.sons.toString();
+					line += temp.getName()+"\t"+temp.getSentiment()+"\nsons: "+temp.sons.toString()+"\n";
 				}
 			}
 		}

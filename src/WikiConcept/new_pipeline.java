@@ -8,12 +8,10 @@ import FanJian.Content;
 
 public class new_pipeline 
 {
-	public void pipe(ArrayList<String> ca_entities, Tree_C tree, ArrayList<String> parse_re, HashMap<String,Integer> p, HashMap<String,Integer> n) throws Exception
+	public void pipe(ArrayList<String> ca_entities, Tree_C tree, ArrayList<String> parse_re, HashMap<String,Integer> p, HashMap<String,Integer> n,Category_merge cm) throws Exception
 	{
 		//Tree_C tree = new Tree_C();
 		getConceptsFWT fwt = new getConceptsFWT();
-		Category_merge cm = new Category_merge();
-		cm.Init();
 //		cm.mutural_as_hie("Catefory:美国篮球运动员", "姚明");
 //		String as = cm.mu_as_hie("Category:篮球运动员", "姚明");
 		
@@ -36,7 +34,7 @@ public class new_pipeline
 			}
 		}
 		//显示情感词与title的绑定结果
-		System.out.println("es_map"+es_map.toString());
+		//System.out.println("es_map"+es_map.toString());
 		
 		Content c = new Content();
 		//再次进行check 以消除 粉丝 四叶草 这种歧义 暂时的想法
@@ -77,9 +75,9 @@ public class new_pipeline
 				}
 			}
 		}
-		cm.close();
+		//cm.close();
 		//got category tree
-		System.out.println(tree.toString());
+		System.out.println("top"+tree.top.category_name+"\n"+tree.toString());
 		
 		
 	}

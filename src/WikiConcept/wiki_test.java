@@ -21,7 +21,7 @@ public class wiki_test
 		weibo_no_stopwords.add(five);
 		Tree_C tree = new Tree_C();
 		new_pipeline pp = new new_pipeline();
-		pp.pipe(weibo_no_stopwords,tree,null,null,null);
+		pp.pipe(weibo_no_stopwords,tree,null,null,null,null);
 		
 //		Tree_C the_tree = new Tree_C();
 //		buildCTree BC_tree = new buildCTree();

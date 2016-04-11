@@ -46,11 +46,11 @@ public class Parse
 //		String model = "edu/stanford/nlp/models/lexparser/chineseFactored.ser.gz";
 //		LexicalizedParser lp = LexicalizedParser.loadModel(model);
 		Tree t = lp.parse(sentence);
-		System.out.println(t);
+		//System.out.println(t);
 		//变换其他格式,依赖格式
 		ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(t);
 	    Collection<TypedDependency> tdl = gs.typedDependenciesCollapsed();
-	    System.out.println(tdl);
+	   // System.out.println(tdl);
 	    
 	    ArrayList<String> ps = new ArrayList<String>();
 	    for (Iterator<TypedDependency> iterator = tdl.iterator(); iterator.hasNext();) 

@@ -14,7 +14,7 @@ public class jieba_seg
 		///List<Term> seg_result = NlpAnalysis.parse(weibo);
 
 		//test output
-		System.out.println(seg_result.toString());
+		//System.out.println(seg_result.toString());
 		return seg_result;
 	}
 
