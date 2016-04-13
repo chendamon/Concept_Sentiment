@@ -30,6 +30,7 @@ public class Tree_Processing
 	}
 	public void process_Node(Tree_C tree, String name)
 	{
+		System.out.println("process_Node: "+name);
 		Node t_n = this.IR_byname(tree, name);
 		if(t_n != null)
 		{

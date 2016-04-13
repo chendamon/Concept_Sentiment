@@ -3,7 +3,11 @@ package NER;
 import java.util.ArrayList;
 import main.java.com.huaban.analysis.jieba.viterbi.Seg;
 
-
+/*
+ * 4/13
+ * 要生成包含POS的分词结果，然后进行实体的过滤
+ * 一共两个版本
+ */
 public class jieba_seg 
 {
 	public ArrayList<String> jieba_Seg(String weibo)

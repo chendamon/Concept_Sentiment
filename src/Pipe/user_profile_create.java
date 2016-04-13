@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import NER.Entity_Sent;
+import NER.Hanlp_seg;
 import NER.StopWords;
 import NER.URLdrop;
 import NER.jieba_seg;
@@ -42,10 +43,10 @@ public class user_profile_create
 		int length = user_list.length;
 		
 		//情感词表，分词系统，停用词表的初始化
-		StopWords sw = new StopWords();
+		//StopWords sw = new StopWords();
 		Parse par = new Parse();
 		par.Init();
-		sw.Init("stopwords.txt");//stopword file path
+		//sw.Init("stopwords.txt");//stopword file path
 		
 		Sent_enti sentiment_table = new Sent_enti();
 		sentiment_table.Init();
@@ -66,7 +67,8 @@ public class user_profile_create
 			ArrayList<String> weibo_content = this.get_user_weibo("active_user/"+user_list[i]);
 			System.out.println("user "+user_list[i]+" weibo read done.");
 			int weibo_size = weibo_content.size();
-			jieba_seg seg = new jieba_seg();
+			//jieba_seg seg = new jieba_seg();
+			Hanlp_seg h_seg = new Hanlp_seg();
 			ArrayList<String> weibo_seg_total = new ArrayList<String>();//整合微博分词结果
 			ArrayList<String> parse_total = new ArrayList<String>();//整合句法分析结果
 			
@@ -83,13 +85,17 @@ public class user_profile_create
 	//			String weibo_no_url = url_drop.url_drop(weibo_content);
 	//			System.out.println("user "+user_list[i]+" weibo url drop done");
 				//分词
-				ArrayList<String> weibo_seg = seg.jieba_Seg(weibo_content.get(j));
+				//hanlp seg
+				//ArrayList<String> weibo_seg = seg.jieba_Seg(weibo_content.get(j));
+				ArrayList<String> weibo_p_seg = h_seg.pure_seg(weibo_content.get(j));
+				ArrayList<String> weibo_f_seg = h_seg.filter_seg(weibo_content.get(j));
 				//System.out.println("user "+user_list[i]+" weibo seg done.");
 				//parse词法分析,进行情感的标注
-				ArrayList<String> parse_result = par.Parse(weibo_seg);
+				ArrayList<String> parse_result = par.Parse(weibo_p_seg);
 				//去停用词
-				ArrayList<String> weibo_no_stopwords = sw.rmStopW(weibo_seg);
-				ArrayList<String> weibo_no_po = this.rmPo(weibo_no_stopwords);
+				//ArrayList<String> weibo_no_stopwords = sw.rmStopW(weibo_f_seg);
+				ArrayList<String> weibo_no_po = this.rmPo(weibo_f_seg);
+				System.out.println("weibo_no_po: "+weibo_no_po.toString());
 				
 				
 				
@@ -99,9 +105,9 @@ public class user_profile_create
 				//HashMap<String,Integer> entity_senti = this.map_e_sentiment(weibo_no_po, parse_result, p, n);
 				new_p.pipe(weibo_no_po,c_tree,parse_result,p,n,cm);
 				
-				count++;
-				if(count == number)
-					break;
+//				count++;
+//				if(count == number)
+//					break;
 				//进行merge
 //				this.merge(weibo_seg_total, weibo_no_po);
 //				this.merge(parse_total, parse_result);

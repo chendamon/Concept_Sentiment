@@ -29,6 +29,7 @@ public class Node
 		this.depth = -1;
 		this.branch = -1;
 		this.sentiment = -99;
+		this.app_time = 0;
 	}
 	public void setSen(Double s)
 	{

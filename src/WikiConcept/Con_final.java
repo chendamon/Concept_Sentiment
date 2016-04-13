@@ -45,10 +45,10 @@ public class Con_final
 			public int compare(Point s1, Point s2) 
 			{
 				if(s1.weight-s2.weight < 0)
-					return 1;
-				else if(s1.weight-s2.weight == 0)
 					return -1;
-				else return 0;
+				else if(s1.weight-s2.weight == 0)
+					return 0;
+				else return 1;
 			}
 		};
 		Collections.sort(points,comparator);

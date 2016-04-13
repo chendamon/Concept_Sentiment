@@ -78,15 +78,21 @@ public class getConceptsFWT
 		}
 		else
 			url = new URL(urls);
-		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();           
-		try {
-			urlcon.connect();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			//重新连接
-			urlcon.connect();
-		}//获取连接
+		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();   
+		boolean disconnect = true;
+		//4.13 循环以保证不会出现连接错误
+		while(disconnect)
+		{
+			try {
+				urlcon.connect();
+				disconnect = false;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			}//获取连接
+		}
+	
 		System.out.println("responsecode"+urlcon.getResponseCode());
 		
 		//判断返回代码 3/15

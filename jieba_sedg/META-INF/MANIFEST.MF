@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Rsrc-Class-Path: ./
+Class-Path: .
+Rsrc-Main-Class: main.java.com.huaban.analysis.jieba.viterbi.Seg
+Main-Class: org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader
+

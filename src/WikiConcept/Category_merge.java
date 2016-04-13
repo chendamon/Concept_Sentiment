@@ -49,6 +49,7 @@ public class Category_merge
 	//添加父子的结构关系
 	public void c_merge(Tree_C tree, String cate_b, int depth, ArrayList<String> entities, HashMap<String,Integer> entity_senti) throws Exception
 	{
+		Tree_Processing tp = new Tree_Processing();
 		//检查是不是已经包含了此类别
 		//计数加1!!!!
 	    if(tree.contain(cate_b))
@@ -73,13 +74,18 @@ public class Category_merge
 					continue;
 				System.out.println("t_a_t"+t);
 				dep_count++;
-				Node te = new Node(t,null);
+				//每个节点加入是进行判定是否重复
+				Node tee = tp.IR_byname(tree, t);
+				Node te = null;
+				if(tee != null)
+					te = tee;
+				else te = new Node(t,null);
 				//添加sons
-				if(i == a_size-2)
+				if(i == a_size-2&&!te.sons.contains(top.getName()))
 				{
 					te.sons.add(top.getName());
 				}
-				else
+				else if(!te.sons.contains(this.path_a.get(i+1)))
 				{
 					te.sons.add(this.path_a.get(i+1));
 				}
@@ -87,7 +93,7 @@ public class Category_merge
 				//判断是否为category，然后加上apptime
 				if(!t.contains("Category"))
 				{
-					te.app_time = 1;
+					te.app_time += 1;
 				}
 				if(entity_senti.containsKey(t))
 				{
@@ -114,23 +120,28 @@ public class Category_merge
 			{
 				String t = this.path_b.get(i);
 				System.out.println("t_b_t"+t);
-				if(t.equals(mu_as))
+				if(t.equals(mu_as)&&!top.sons.contains(this.path_b.get(i+1)))
 				{
 					top.sons.add(this.path_b.get(i+1));
 					continue;
 				}
 					
+				//每个节点加入是进行判定是否重复
+				Node tee = tp.IR_byname(tree, t);
+				Node te = null;
+				if(tee != null)
+					te = tee;
+				else te = new Node(t,null);
 				
-				Node te = new Node(t,null);
 				//添加sons
-				if(i < b_size-1)
+				if(i < b_size-1&&!te.sons.contains(this.path_b.get(i+1)))
 				{
 					te.sons.add(this.path_b.get(i+1));
 				}
 				
 				if(!t.contains("Category"))
 				{
-					te.app_time = 1;
+					te.app_time += 1;
 				}
 				if(entity_senti.containsKey(t))
 				{
@@ -166,6 +177,7 @@ public class Category_merge
 					
 					if(as.equals(temp.getName()))//说明temp是父节点，进行添加，负责直接下一层
 					{
+						System.out.println("I'm your fahter!!!!!");
 						int dep_count = 0;
 						for(int i = 0; i < this.path_b.size() ; i++)
 						{
@@ -173,16 +185,22 @@ public class Category_merge
 							dep_count++;
 							if(name.equals(temp_name))
 								continue;
-							Node t = new Node(name,null);
-							if(i < this.path_b.size()-1&&i>0)
+							//每个节点加入是进行判定是否重复
+							Node tee = tp.IR_byname(tree, name);
+							Node t = null;
+							if(tee != null)
+								t = tee;
+							else t = new Node(name,null);
+							
+							if(i < this.path_b.size()-1&&i>0&&!t.sons.contains(this.path_b.get(i+1)))
 								t.sons.add(this.path_b.get(i+1));
-							if(i == 1)
+							if(i == 1&&!temp.sons.contains(name))
 							{
 								temp.sons.add(name);
 							}
 							if(!name.contains("Category"))
 							{
-								t.app_time = 1;
+								t.app_time++;;
 							}
 							if(entity_senti.containsKey(name))
 							{
