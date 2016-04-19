@@ -31,6 +31,8 @@ public class Sentiment_parse_pathch
 		for(int i = 0; i < size; i++)
 		{
 			String temp = parse_re.get(i);
+			//
+			
 			System.out.println(temp);
 			String fi = null;
 			String f_r = "\\(.*?-";

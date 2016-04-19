@@ -63,6 +63,9 @@ public class Category_merge
 			this.path_b.add(cate_b);
 			//就是同一层的好多结果
 			String mu_as = this.mu_as_hie(top.getName(), cate_b, entities);
+			//如果实在找不到直接舍弃算了
+			if(mu_as == null)
+				return;
 			int dep_count = 0;
 			String son = top.getName();
 			//path 要进行反转
@@ -85,7 +88,7 @@ public class Category_merge
 				{
 					te.sons.add(top.getName());
 				}
-				else if(!te.sons.contains(this.path_a.get(i+1)))
+				else if(i < a_size-1&&!te.sons.contains(this.path_a.get(i+1)))
 				{
 					te.sons.add(this.path_a.get(i+1));
 				}
@@ -120,7 +123,7 @@ public class Category_merge
 			{
 				String t = this.path_b.get(i);
 				System.out.println("t_b_t"+t);
-				if(t.equals(mu_as)&&!top.sons.contains(this.path_b.get(i+1)))
+				if(t.equals(mu_as)&&i < b_size-1&&!top.sons.contains(this.path_b.get(i+1)))
 				{
 					top.sons.add(this.path_b.get(i+1));
 					continue;
@@ -175,7 +178,7 @@ public class Category_merge
 					String as = this.mu_as_hie(temp.getName(), cate_b, entities);
 					System.out.println("mu_father:"+ as);//这里的父节点并不是最终的父节点
 					
-					if(as.equals(temp.getName()))//说明temp是父节点，进行添加，负责直接下一层
+					if(as != null&&as.equals(temp.getName()))//说明temp是父节点，进行添加，负责直接下一层
 					{
 						System.out.println("I'm your fahter!!!!!");
 						int dep_count = 0;
@@ -488,7 +491,7 @@ public class Category_merge
 	//分层次，
 	public String mu_as_hie(String cate_a, String cate_b, ArrayList<String> context) throws Exception
 	{
-		ArrayList<String> p_here = new ArrayList<String>();
+		
 		
 		System.out.println("cate"+cate_a+"\t"+"cate"+cate_b);
 		String p = this.zero_one(cate_a, cate_b, context);

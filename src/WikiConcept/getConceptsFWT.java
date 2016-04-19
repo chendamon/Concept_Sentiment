@@ -89,6 +89,7 @@ public class getConceptsFWT
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				disconnect = true;
 				continue;
 			}//获取连接
 		}

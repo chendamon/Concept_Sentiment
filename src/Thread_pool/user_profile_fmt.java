@@ -19,16 +19,10 @@ import WikiConcept.new_pipeline;
 
 public class user_profile_fmt 
 {
-	public String user_profile_create(String user_id) throws Exception
+	public String user_profile_create(String user_id, Parse par, int number,HashMap<String,Integer> p,HashMap<String,Integer> n) throws Exception
 	{
-		Parse par = new Parse();
-		par.Init();
-		//sw.Init("stopwords.txt");//stopword file path
+
 		
-		Sent_enti sentiment_table = new Sent_enti();
-		sentiment_table.Init();
-		HashMap<String,Integer> p = sentiment_table.getP();
-		HashMap<String,Integer> n = sentiment_table.getN();
 		//数据库初始化
 		Category_merge cm = new Category_merge();
 		cm.Init();//后面记得close
@@ -36,7 +30,7 @@ public class user_profile_fmt
 		//循环的时候，如果直接对用户所有微博同时进行处理可能会有问题，主要是parse
 		//出现不对的依存关系
 		//加\n尝试一下 失败
-		System.out.println("user id: "+user_id+"possing...");
+		System.out.println("user id: "+user_id+"possing... "+number);
 			//对每个用户进行循环
 		//微博换成数组 先只考虑自己的内容 如果自己内容为转发微博在考虑 转发原微博的内容
 		ArrayList<String> weibo_content = this.get_user_weibo("active_user/"+user_id);
@@ -55,11 +49,7 @@ public class user_profile_fmt
 		for(int j = 0; j < weibo_size; j++)
 		{
 			System.out.println("Now processing the "+j);
-			//去除URL 换到微博提取的部分进行
-//			URLdrop url_drop = new URLdrop();
-//			String weibo_no_url = url_drop.url_drop(weibo_content);
-//			System.out.println("user "+user_list[i]+" weibo url drop done");
-			//分词
+			
 			//hanlp seg
 			//ArrayList<String> weibo_seg = seg.jieba_Seg(weibo_content.get(j));
 			ArrayList<String> weibo_p_seg = h_seg.pure_seg(weibo_content.get(j));
@@ -79,32 +69,31 @@ public class user_profile_fmt
 			//不行 因为 tfboys TFBOYS的情况存在 drop it
 			//HashMap<String,Integer> entity_senti = this.map_e_sentiment(weibo_no_po, parse_result, p, n);
 			new_p.pipe(weibo_no_po,c_tree,parse_result,p,n,cm);
+			//break;
 			
-//				count++;
-//				if(count == number)
-//					break;
-			//进行merge
-//				this.merge(weibo_seg_total, weibo_no_po);
-//				this.merge(parse_total, parse_result);
+			count++;
+			if(count == number)
+				break;
+			
 		}
-		//所有微博分词，分析模块结束
-	//	System.out.println(user_list[i]+"分词结果为: "+weibo_seg_total.toString());
-		//System.out.println(user_list[i]+"句法分析结果为: "+parse_total.toString());
-		//entity sentimen绑定
-		//Entity_Sent en_s = new Entity_Sent();
-		//HashMap<String,Integer> eS = en_s.gule(weibo_seg_total, parse_total);
-		//3 30还是有问题这个地方，之后用后边的patch
 		
-		System.out.println(c_tree.toString());
+		
+		System.out.println("ctree: "+c_tree.toString());
 		//进行用户profile的构建
 		//4.8 概念树权重的计算
+		String re = "";
+		if(c_tree.getTNodes().size() == 0)
+			return re;
 		Tree_Processing tp = new Tree_Processing();
 		tp.Tree_propagate(c_tree);
 		Con_final cf = new Con_final();
 		cf.cal_CP(c_tree, tp);
 		int size = c_tree.getTNodes().size();
 		ArrayList<Point> concept_result = cf.getTopK(size);
-		String re = this.C2File(concept_result);
+		re = this.C2File(concept_result);
+		
+		//关闭数据库连接
+		cm.close();
 		return re;
 	}
 	ArrayList<String> get_user_weibo(String  path) throws Exception
@@ -133,7 +122,7 @@ public class user_profile_fmt
 //			weibo_content = weibo_content.replaceAll("转发微博", "");
 		}
 		reader.close();
-		System.out.println("user weibo read done.");
+		System.out.println("user weibo read done. "+weibo_content_array.size());
 		//return weibo_content;
 		return weibo_content_array;
 	}

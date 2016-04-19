@@ -19,7 +19,7 @@ public class new_pipeline
 		Sentiment_parse_pathch sentiment = new Sentiment_parse_pathch();
 		sentiment.Init(parse_re);
 		
-		//System.out.println(cm.father_category_sql("Category:中国篮球运动员").toString());
+		
 		//先进行消歧
 		ArrayList<String> wiki_title = new ArrayList<String>();
 		for(String entity:ca_entities)
@@ -77,7 +77,8 @@ public class new_pipeline
 		}
 		//cm.close();
 		//got category tree
-		System.out.println("top"+tree.top.category_name+"\n"+tree.toString());
+		if(tree.nodes.size() > 0)
+			System.out.println("top"+tree.top.category_name+"\n"+tree.toString());
 		
 		
 	}

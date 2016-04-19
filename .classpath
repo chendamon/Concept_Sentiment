@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="F:/stanford-parser-full-2014-08-27/stanford-parser.jar"/>
 	<classpathentry kind="lib" path="F:/stanford-parser-full-2014-08-27/stanford-parser-3.4.1-models.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Biront/Documents/GitHub/Concept_Sentiment/hanlp-1.2.9.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Biront/Desktop/jar包/args4j-2.33.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
