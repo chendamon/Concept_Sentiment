@@ -20,6 +20,12 @@ public class regex_test
 			
 			//sy.put(category_url, category_dep);
 		}
+		
+		String ll = "";
+		regex = "\\\\x[0-9A-Z]+";
+		ll = ll.replaceAll(regex, "");
+		System.out.println("ll"+ll);
+		
 	}
 
 }

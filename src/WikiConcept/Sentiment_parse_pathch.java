@@ -72,7 +72,7 @@ public class Sentiment_parse_pathch
 	//马丹，这个是双向的，难道我要用两个map？
 	public int eword_find(String entity, HashMap<String,Integer> p, HashMap<String,Integer> n, HashMap<String,Integer> scaned)
 	{
-		System.out.println("sentiment"+entity);
+		//System.out.println("sentiment"+entity);
 		//HashMap<String,Integer> scaned = new HashMap<String,Integer>();//记录已经看过的词，避免环路 的出现
 		scaned.put(entity, 0);
 		double sentiment = 0.0;

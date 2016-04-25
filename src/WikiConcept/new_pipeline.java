@@ -12,8 +12,7 @@ public class new_pipeline
 	{
 		//Tree_C tree = new Tree_C();
 		getConceptsFWT fwt = new getConceptsFWT();
-//		cm.mutural_as_hie("Catefory:美国篮球运动员", "姚明");
-//		String as = cm.mu_as_hie("Category:篮球运动员", "姚明");
+
 		
 		HashMap<String, Integer> es_map = new HashMap<String,Integer>();
 		Sentiment_parse_pathch sentiment = new Sentiment_parse_pathch();
@@ -21,6 +20,9 @@ public class new_pipeline
 		
 		
 		//先进行消歧
+	    //首先如果数据库里只有一个候选项就没有必要进行网页访问了。
+		
+		
 		ArrayList<String> wiki_title = new ArrayList<String>();
 		for(String entity:ca_entities)
 		{
@@ -49,6 +51,9 @@ public class new_pipeline
 			}
 		}
 		System.out.println("final wiki_title: "+wiki_title.toString());
+		
+		
+		
 		
 		//添加情感词的绑定
 		

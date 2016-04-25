@@ -43,8 +43,14 @@ public class Content
 		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();      
         
 		boolean disconnect = true;
+		int loop_num = 10;
 		while(disconnect)
 		{
+			loop_num --;
+			if(loop_num == 0)
+			{
+				return 0;
+			}
 			try {
 				urlcon.connect();
 				disconnect = false;

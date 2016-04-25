@@ -80,25 +80,51 @@ public class getConceptsFWT
 			url = new URL(urls);
 		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();   
 		boolean disconnect = true;
+		urlcon.setConnectTimeout(1000);
 		//4.13 循环以保证不会出现连接错误
+		//设置循环次数，直接不行就舍弃了
+		int loop_num = 10;
 		while(disconnect)
 		{
+		   loop_num--;
+		   if(loop_num == 0)//直接舍弃掉当前的实体
+		   {
+			   return null;
+		   }
 			try {
 				urlcon.connect();
 				disconnect = false;
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
+				System.out.println("re connecting");
 				disconnect = true;
-				continue;
+				//continue;
 			}//获取连接
 		}
-	
-		System.out.println("responsecode"+urlcon.getResponseCode());
+	    int code = 0;
+	    loop_num = 10;
+	    disconnect = true;
+	    while(disconnect&&loop_num >= 0)
+	    {
+	    	loop_num--;
+	    	try 
+			{
+				code = urlcon.getResponseCode();
+				System.out.println("responsecode"+code);
+				disconnect = false;
+			} catch (IOException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("still trying");
+			}
+	    }
 		
 		//判断返回代码 3/15
 		//如果返回代码不是200直接不管了
-		if(urlcon.getResponseCode() != 200)
+		if(code != 200)
 		{
 			return null;
 		}

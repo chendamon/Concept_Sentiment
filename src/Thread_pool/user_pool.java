@@ -34,12 +34,15 @@ public class user_pool
 	@Option(name="-threadnum", usage="Specify how many thread we will use")
 	public int thread_num = 10;
 	@Option(name="-usernum", usage="Specify how many user we will process")
-	public int user_num = 10;
+	public int user_num = -1;
 	@Option(name="-weibonum", usage="Specify how many weibo per user we will process")
-	public int weibo_num = 10;
+	public int weibo_num = -1;
 	
 	public static void main(String[] args) throws Exception
 	{
+		File profile = new File("user.profile");
+		if(profile.exists())
+			profile.delete();
 		new user_pool().domain(args);
 	}
 	public void domain(String[] args) throws Exception
@@ -85,7 +88,10 @@ public class user_pool
 //		int count = Integer.parseInt(args[1]);
 //		int pool_num = Integer.parseInt(args[2]);
 		
-		ExecutorService pool = Executors.newFixedThreadPool(thread_num); 
+		//ExecutorService pool = Executors.newFixedThreadPool(thread_num); 
+		//change to normal thread pool without output
+		ThreadPoolExecutor executor = new ThreadPoolExecutor(thread_num, 40, 200, TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<Runnable>(thread_num));
 		
 		Parse par = new Parse();
 		par.Init();
@@ -99,31 +105,37 @@ public class user_pool
 		System.out.println("user_list read done.");
 		int length = user_list.length;
 		ArrayList<String> cw = new ArrayList<String>();
+		//处理-1
+		if(user_num == -1)
+			user_num = user_list.length;
+		System.out.println("user_num: "+user_num);
         for(int i = 0; i < user_num; i++)
         {
 	    	String user_id = user_list[i];
-	    	Callable c1 = new user_profile(user_id,par,weibo_num,p,n); 
-	        Future f = pool.submit(c1);
-	        String re = (String)f.get();
-	        cw.add(re);
+	        System.out.println("This thread processing user: "+user_id);
+//	    	Callable c1 = new user_profile(user_id,par,weibo_num,p,n); 
+//	        Future f = pool.submit(c1);
+//	        String re = (String)f.get();
+	        executor.execute(new user_profile(user_id,par,weibo_num,p,n));
             
         }
-        pool.shutdown();
+        executor.shutdown();
         //结果写入文件
-        File file = new File("user.profile");
-        if(file.exists())
-        	file.delete();
-        file.createNewFile();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true),"utf-8"));
-        int size = cw.size();
-        for(String c:cw)
-        {
-        	writer.append(c);
-		    writer.flush();
-        }
-		
-		writer.close();
-		st.show_time();
+//        File file = new File("user.profile");
+//        if(file.exists())
+//        	file.delete();
+//        file.createNewFile();
+//        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true),"utf-8"));
+//        int size = cw.size();
+//        System.out.println("cw's size: "+size);
+//        for(String c:cw)
+//        {
+//        	writer.append(c);
+//		    writer.flush();
+//        }
+//		
+//		writer.close();
+//		st.show_time();
         
 	}
 	static String[] get_user_list(String dirname) throws Exception
@@ -135,7 +147,7 @@ public class user_pool
 		return user_list;
 	}
 }
-class user_profile implements Callable
+class user_profile implements Runnable
 {
 	user_profile_fmt fmt;
 	String id;
@@ -153,11 +165,26 @@ class user_profile implements Callable
 		this.n = n;
 	}
 
+//	@Override
+//	public Object call() throws Exception 
+//	{
+//		// TODO Auto-generated method stub
+//		return fmt.user_profile_create(id,par,count,p,n);
+//	}
+
 	@Override
-	public Object call() throws Exception 
+	public void run() 
 	{
 		// TODO Auto-generated method stub
-		return fmt.user_profile_create(id,par,count,p,n);
+		try {
+			this.fmt.user_profile_create(id, par, count, p, n);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("user: "+id+" processing done.");
+		
+		
 	}
 	
 }

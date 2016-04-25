@@ -1,9 +1,12 @@
 package Thread_pool;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -19,10 +22,11 @@ import WikiConcept.new_pipeline;
 
 public class user_profile_fmt 
 {
-	public String user_profile_create(String user_id, Parse par, int number,HashMap<String,Integer> p,HashMap<String,Integer> n) throws Exception
+	public void user_profile_create(String user_id, Parse par, int number,HashMap<String,Integer> p,HashMap<String,Integer> n) throws Exception
 	{
 
-		
+		//判定是不是在多线程
+		System.out.println("NOW processing user: "+user_id);
 		//数据库初始化
 		Category_merge cm = new Category_merge();
 		cm.Init();//后面记得close
@@ -46,14 +50,20 @@ public class user_profile_fmt
 		Tree_C c_tree = new Tree_C();
 		new_pipeline new_p = new new_pipeline();
 		int count = 0;
+		//处理weibo_count
+		if(number == -1)
+			number = weibo_size;
+		System.out.println("weibo_num: "+number);
 		for(int j = 0; j < weibo_size; j++)
 		{
-			System.out.println("Now processing the "+j);
 			
+			System.out.println("Now processing the "+j);
+			String weibo = weibo_content.get(j);
+			weibo = weibo.replaceAll("\\s+", "");
 			//hanlp seg
 			//ArrayList<String> weibo_seg = seg.jieba_Seg(weibo_content.get(j));
-			ArrayList<String> weibo_p_seg = h_seg.pure_seg(weibo_content.get(j));
-			ArrayList<String> weibo_f_seg = h_seg.filter_seg(weibo_content.get(j));
+			ArrayList<String> weibo_p_seg = h_seg.pure_seg(weibo);
+			ArrayList<String> weibo_f_seg = h_seg.filter_seg(weibo);
 			//System.out.println("user "+user_list[i]+" weibo seg done.");
 			//parse词法分析,进行情感的标注
 			ArrayList<String> parse_result = par.Parse(weibo_p_seg);
@@ -83,7 +93,7 @@ public class user_profile_fmt
 		//4.8 概念树权重的计算
 		String re = "";
 		if(c_tree.getTNodes().size() == 0)
-			return re;
+			return;
 		Tree_Processing tp = new Tree_Processing();
 		tp.Tree_propagate(c_tree);
 		Con_final cf = new Con_final();
@@ -94,7 +104,20 @@ public class user_profile_fmt
 		
 		//关闭数据库连接
 		cm.close();
-		return re;
+		//return user_id+":\n"+re;
+		//write to file
+		File file = new File("user.profile");
+        if(!file.exists())
+        	throw new Exception("file not exist.");
+        file.createNewFile();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true),"utf-8"));
+        
+       
+        writer.append(user_id+":\n"+re);
+	    writer.flush();
+        
+		
+		writer.close();
 	}
 	ArrayList<String> get_user_weibo(String  path) throws Exception
 	{

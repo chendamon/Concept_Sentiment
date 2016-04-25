@@ -325,7 +325,7 @@ public class Category_merge
 		}
 		
 		return category_son;
-	}
+	} 
 	//从数据库中读取父类
 	public ArrayList<String> father_category_sql(String category) throws Exception
 	{
