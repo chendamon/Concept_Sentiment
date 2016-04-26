@@ -62,8 +62,25 @@ public class Content
 			}//获取连接
 		}
 		//System.out.println("responsecode"+urlcon.getResponseCode());
-		
-		if(urlcon.getResponseCode() != 200)
+		int code = 0;
+		loop_num = 10;
+	    disconnect = true;
+	    while(disconnect&&loop_num >= 0)
+	    {
+	    	loop_num--;
+	    	try 
+			{
+				code = urlcon.getResponseCode();
+				System.out.println("responsecode"+code);
+				disconnect = false;
+			} catch (IOException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("still trying");
+			}
+	    }
+		if(code != 200)
 		{
 			return 0;
 		}

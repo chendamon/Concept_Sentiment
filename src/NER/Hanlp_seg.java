@@ -18,13 +18,24 @@ public class Hanlp_seg
 {
 	public void Seg()
 	{
-		List<Term> termList = NLPTokenizer.segment("你认为tfboys拥有最强大的粉丝群吗？");
+		NLPTokenizer nlp = new NLPTokenizer();
+		List<Term> termList = nlp.segment("要开始虐了讨厌..//“面对她一步步的靠近，他却只能一次又一次的逃离。这场执恋，磨砺的是她的情，更是她的心”这版预告片[泪]~还没大甜就要开虐了T-T下周见[泪]");
 		System.out.println(termList);
 	}
 	//结果只有分词 没有词性标注
 	public ArrayList<String> pure_seg(String weibo)
 	{
-		List<Term> termList = NLPTokenizer.segment(weibo);
+		List<Term> termList = null;
+		NLPTokenizer nlp = new NLPTokenizer();
+		try
+		{
+			termList = nlp.segment(weibo);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			System.out.println("seg error: "+weibo);
+		}
 		//System.out.println("ori: "+termList.toString());
 		int size = termList.size();
 		ArrayList<String> ps = new ArrayList<String>();
@@ -38,7 +49,8 @@ public class Hanlp_seg
 	}
 	public ArrayList<String> filter_seg(String weibo)
 	{
-		List<Term> termList = NLPTokenizer.segment(weibo);
+		NLPTokenizer nlp = new NLPTokenizer();
+		List<Term> termList = nlp.segment(weibo);
 		int size = termList.size();
 		ArrayList<String> ps = new ArrayList<String>();
 		for(int i = 0; i < size; i++)
@@ -58,6 +70,11 @@ public class Hanlp_seg
 			
 		}
 		return ps;
+	}
+	public static void main(String[] args)
+	{
+		Hanlp_seg se = new Hanlp_seg();
+		se.Seg();
 	}
 	
 

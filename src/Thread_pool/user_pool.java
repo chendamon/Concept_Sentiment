@@ -20,6 +20,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import Date.showtime;
+import NER.Hanlp_seg;
 import Sentiment.Parse;
 import Sentiment.Sent_enti;
 
@@ -90,7 +91,7 @@ public class user_pool
 		
 		//ExecutorService pool = Executors.newFixedThreadPool(thread_num); 
 		//change to normal thread pool without output
-		ThreadPoolExecutor executor = new ThreadPoolExecutor(thread_num, 40, 200, TimeUnit.MILLISECONDS,
+		ThreadPoolExecutor executor = new ThreadPoolExecutor(thread_num, 50, 200, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<Runnable>(thread_num));
 		
 		Parse par = new Parse();
@@ -98,6 +99,7 @@ public class user_pool
 		
 		Sent_enti sentiment_table = new Sent_enti();
 		sentiment_table.Init();
+		Hanlp_seg hanlp = new Hanlp_seg();
 		HashMap<String,Integer> p = sentiment_table.getP();
 		HashMap<String,Integer> n = sentiment_table.getN();
          
@@ -109,14 +111,44 @@ public class user_pool
 		if(user_num == -1)
 			user_num = user_list.length;
 		System.out.println("user_num: "+user_num);
+		
         for(int i = 0; i < user_num; i++)
         {
 	    	String user_id = user_list[i];
-	        System.out.println("This thread processing user: "+user_id);
-//	    	Callable c1 = new user_profile(user_id,par,weibo_num,p,n); 
-//	        Future f = pool.submit(c1);
-//	        String re = (String)f.get();
-	        executor.execute(new user_profile(user_id,par,weibo_num,p,n));
+	    	user_profile_fmt fmt = new user_profile_fmt();
+	    	//分词进行外提
+	    	ArrayList<String> weibo_content = fmt.get_user_weibo("active_user/"+user_id);
+	    	int size = weibo_content.size();
+	    	ArrayList<String> p_seg = null;
+	    	ArrayList<String> f_seg = null;
+	    	
+	    	for(int j = 0; j < size; j++)
+			{
+				//System.out.println("Now processing the "+j);
+				String weibo = weibo_content.get(j);
+				weibo = weibo.replaceAll("\\s+", "");
+				//hanlp seg
+				//ArrayList<String> weibo_seg = seg.jieba_Seg(weibo_content.get(j));
+				p_seg = hanlp.pure_seg(weibo);
+				f_seg = hanlp.filter_seg(weibo);
+			}
+	    	
+	    	
+	    	
+	        System.out.println("seg done, This thread processing user: "+user_id);
+	        try
+	        {
+	        	executor.execute(new user_profile(user_id,par,weibo_num,p,n,p_seg,f_seg,size,fmt));
+	        }
+	        catch(Exception e)
+	        {
+	        	System.out.println("index: "+i+", pool full, trying...");
+	        	Thread.sleep(2000);
+	        	i--;
+	        }
+	        
+	        System.out.println("线程池中线程数目："+executor.getPoolSize()+"，队列中等待执行的任务数目："+
+            executor.getQueue().size()+"，已执行玩别的任务数目："+executor.getCompletedTaskCount());
             
         }
         executor.shutdown();
@@ -155,14 +187,21 @@ class user_profile implements Runnable
 	int count;
 	HashMap<String,Integer> p;
 	HashMap<String,Integer> n;
-	user_profile(String id, Parse par,int count,HashMap<String,Integer> p,HashMap<String,Integer> n)
+	ArrayList<String> p_seg;
+	ArrayList<String> f_seg;
+	int weibo_size;
+	user_profile(String id, Parse par,int count,HashMap<String,Integer> p,HashMap<String,Integer> n, ArrayList<String> p_seg, ArrayList<String> f_seg, int weibo_size,
+			user_profile_fmt fmt)
 	{
-		fmt = new user_profile_fmt();
+		this.fmt = fmt;
 		this.id = id;
 		this.par = par;
 		this.count = count;
 		this.p = p;
 		this.n = n;
+		this.p_seg = p_seg;
+		this.f_seg = f_seg;
+		this.weibo_size = weibo_size;
 	}
 
 //	@Override
@@ -177,7 +216,7 @@ class user_profile implements Runnable
 	{
 		// TODO Auto-generated method stub
 		try {
-			this.fmt.user_profile_create(id, par, count, p, n);
+			this.fmt.user_profile_create(id, par, count, p, n,p_seg,f_seg,weibo_size);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

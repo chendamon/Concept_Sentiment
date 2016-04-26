@@ -22,7 +22,8 @@ import WikiConcept.new_pipeline;
 
 public class user_profile_fmt 
 {
-	public void user_profile_create(String user_id, Parse par, int number,HashMap<String,Integer> p,HashMap<String,Integer> n) throws Exception
+	public void user_profile_create(String user_id, Parse par, int number,HashMap<String,Integer> p,HashMap<String,Integer> n, ArrayList<String> weibo_p_seg, ArrayList<String> weibo_f_seg
+			, int weibo_size) throws Exception
 	{
 
 		//判定是不是在多线程
@@ -37,13 +38,13 @@ public class user_profile_fmt
 		System.out.println("user id: "+user_id+"possing... "+number);
 			//对每个用户进行循环
 		//微博换成数组 先只考虑自己的内容 如果自己内容为转发微博在考虑 转发原微博的内容
-		ArrayList<String> weibo_content = this.get_user_weibo("active_user/"+user_id);
-		System.out.println("user "+user_id+" weibo read done.");
-		int weibo_size = weibo_content.size();
-		//jieba_seg seg = new jieba_seg();
-		Hanlp_seg h_seg = new Hanlp_seg();
-		ArrayList<String> weibo_seg_total = new ArrayList<String>();//整合微博分词结果
-		ArrayList<String> parse_total = new ArrayList<String>();//整合句法分析结果
+//		ArrayList<String> weibo_content = this.get_user_weibo("active_user/"+user_id);
+//		System.out.println("user "+user_id+" weibo read done.");
+//		int weibo_size = weibo_content.size();
+//		//jieba_seg seg = new jieba_seg();
+//		Hanlp_seg h_seg = new Hanlp_seg();
+//		ArrayList<String> weibo_seg_total = new ArrayList<String>();//整合微博分词结果
+//		ArrayList<String> parse_total = new ArrayList<String>();//整合句法分析结果
 		
 		//3 30有问题，并不能直接所有的都进行合并，还是要一条一条过，否则影响实体消歧的效果
 		
@@ -58,12 +59,12 @@ public class user_profile_fmt
 		{
 			
 			System.out.println("Now processing the "+j);
-			String weibo = weibo_content.get(j);
-			weibo = weibo.replaceAll("\\s+", "");
-			//hanlp seg
-			//ArrayList<String> weibo_seg = seg.jieba_Seg(weibo_content.get(j));
-			ArrayList<String> weibo_p_seg = h_seg.pure_seg(weibo);
-			ArrayList<String> weibo_f_seg = h_seg.filter_seg(weibo);
+//			String weibo = weibo_content.get(j);
+//			weibo = weibo.replaceAll("\\s+", "");
+//			//hanlp seg
+//			//ArrayList<String> weibo_seg = seg.jieba_Seg(weibo_content.get(j));
+//			ArrayList<String> weibo_p_seg = h_seg.pure_seg(weibo);
+//			ArrayList<String> weibo_f_seg = h_seg.filter_seg(weibo);
 			//System.out.println("user "+user_list[i]+" weibo seg done.");
 			//parse词法分析,进行情感的标注
 			ArrayList<String> parse_result = par.Parse(weibo_p_seg);
@@ -108,8 +109,7 @@ public class user_profile_fmt
 		//write to file
 		File file = new File("user.profile");
         if(!file.exists())
-        	throw new Exception("file not exist.");
-        file.createNewFile();
+        	file.createNewFile();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true),"utf-8"));
         
        
@@ -155,7 +155,7 @@ public class user_profile_fmt
 		for(int i = 0; i < words.size(); i++)
 		{
 			String word = words.get(i);
-			//System.out.println("word: "+word);
+			
 			word = word.replaceAll("\\pP|\\pS", "");
 			//System.out.println("word after: "+word);
 			word = word.replaceAll(" ", "");
