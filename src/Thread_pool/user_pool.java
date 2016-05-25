@@ -23,6 +23,7 @@ import Date.showtime;
 import NER.Hanlp_seg;
 import Sentiment.Parse;
 import Sentiment.Sent_enti;
+import WikiConcept.StopCate;
 
 /*
  * 每个用户的pipe是一个线程
@@ -33,11 +34,11 @@ public class user_pool
 {
 	//options 4.19
 	@Option(name="-threadnum", usage="Specify how many thread we will use")
-	public int thread_num = 10;
+	public int thread_num;
 	@Option(name="-usernum", usage="Specify how many user we will process")
-	public int user_num = -1;
+	public int user_num;
 	@Option(name="-weibonum", usage="Specify how many weibo per user we will process")
-	public int weibo_num = -1;
+	public int weibo_num;
 	
 	public static void main(String[] args) throws Exception
 	{
@@ -55,6 +56,9 @@ public class user_pool
 		try {
             // parse the arguments.
             parser.parseArgument(args);
+            thread_num = option.thread_num;
+            user_num  = option.user_num;
+            weibo_num = option.weibo_num;
  
             // you can parse additional arguments if you want.
             // parser.parseArgument("more","args");
@@ -80,7 +84,8 @@ public class user_pool
             return;
         }
         
-		
+		//参数调试
+		System.out.println("线程数: "+thread_num+" 用户数: "+user_num+" 微博数: "+weibo_num);
 
 		//测试用例的数目
 		showtime st = new showtime();
@@ -96,18 +101,23 @@ public class user_pool
 		
 		Parse par = new Parse();
 		par.Init();
-		
+		//情感词的提前准备
 		Sent_enti sentiment_table = new Sent_enti();
 		sentiment_table.Init();
 		Hanlp_seg hanlp = new Hanlp_seg();
 		HashMap<String,Integer> p = sentiment_table.getP();
 		HashMap<String,Integer> n = sentiment_table.getN();
-         
+        //读取用户列表 
 		String[] user_list = get_user_list("active_user");
 		System.out.println("user_list read done.");
 		int length = user_list.length;
 		ArrayList<String> cw = new ArrayList<String>();
-		//处理-1
+		
+		//categorty stop类别
+        StopCate sc = new StopCate();
+		ArrayList<String> cate_stop = sc.InitCstop("category_stop.txt");
+		
+		//处理-1参数
 		if(user_num == -1)
 			user_num = user_list.length;
 		System.out.println("user_num: "+user_num);
@@ -116,21 +126,25 @@ public class user_pool
         {
 	    	String user_id = user_list[i];
 	    	user_profile_fmt fmt = new user_profile_fmt();
-	    	//分词进行外提
+	    	//分词进行外提 分词 要在整个县城之外进行， 否则hanlp的错误
 	    	ArrayList<String> weibo_content = fmt.get_user_weibo("active_user/"+user_id);
 	    	int size = weibo_content.size();
 	    	ArrayList<String> p_seg = null;
 	    	ArrayList<String> f_seg = null;
 	    	
+	    	ArrayList<ArrayList<String>> pp_seg = new ArrayList<ArrayList<String>>();
+	    	ArrayList<ArrayList<String>> ff_seg = new ArrayList<ArrayList<String>>();
 	    	for(int j = 0; j < size; j++)
 			{
 				//System.out.println("Now processing the "+j);
 				String weibo = weibo_content.get(j);
 				weibo = weibo.replaceAll("\\s+", "");
 				//hanlp seg
-				//ArrayList<String> weibo_seg = seg.jieba_Seg(weibo_content.get(j));
 				p_seg = hanlp.pure_seg(weibo);
 				f_seg = hanlp.filter_seg(weibo);
+				
+				pp_seg.add(p_seg);
+				ff_seg.add(f_seg);
 			}
 	    	
 	    	
@@ -138,7 +152,8 @@ public class user_pool
 	        System.out.println("seg done, This thread processing user: "+user_id);
 	        try
 	        {
-	        	executor.execute(new user_profile(user_id,par,weibo_num,p,n,p_seg,f_seg,size,fmt));
+	        	executor.execute(new user_profile(user_id,par,weibo_num,p,n,pp_seg,ff_seg,size,fmt,cate_stop));
+	        	//st.show_time();
 	        }
 	        catch(Exception e)
 	        {
@@ -167,7 +182,7 @@ public class user_pool
 //        }
 //		
 //		writer.close();
-//		st.show_time();
+		st.show_time();
         
 	}
 	static String[] get_user_list(String dirname) throws Exception
@@ -187,11 +202,12 @@ class user_profile implements Runnable
 	int count;
 	HashMap<String,Integer> p;
 	HashMap<String,Integer> n;
-	ArrayList<String> p_seg;
-	ArrayList<String> f_seg;
+	ArrayList<ArrayList<String>> p_seg;
+	ArrayList<ArrayList<String>> f_seg;
+	ArrayList<String> cate_stop;
 	int weibo_size;
-	user_profile(String id, Parse par,int count,HashMap<String,Integer> p,HashMap<String,Integer> n, ArrayList<String> p_seg, ArrayList<String> f_seg, int weibo_size,
-			user_profile_fmt fmt)
+	user_profile(String id, Parse par,int count,HashMap<String,Integer> p,HashMap<String,Integer> n, ArrayList<ArrayList<String>> p_seg, ArrayList<ArrayList<String>> f_seg, int weibo_size,
+			user_profile_fmt fmt, ArrayList<String> cate_stop)
 	{
 		this.fmt = fmt;
 		this.id = id;
@@ -202,6 +218,7 @@ class user_profile implements Runnable
 		this.p_seg = p_seg;
 		this.f_seg = f_seg;
 		this.weibo_size = weibo_size;
+		this.cate_stop = cate_stop;
 	}
 
 //	@Override
@@ -216,7 +233,8 @@ class user_profile implements Runnable
 	{
 		// TODO Auto-generated method stub
 		try {
-			this.fmt.user_profile_create(id, par, count, p, n,p_seg,f_seg,weibo_size);
+			//user profile构建主函数
+			this.fmt.user_profile_create(id, par, count, p, n,p_seg,f_seg,weibo_size,cate_stop);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

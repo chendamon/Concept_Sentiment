@@ -9,8 +9,35 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import org.bson.Document;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
+import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+
 public class Content 
 {
+	MongoClient mongo;
+	MongoDatabase db;
+	public Content()
+	{
+		this.mongo = null;
+		this.db = null;
+	}
+	public void Init()
+	{
+		this.mongo = new MongoClient("172.19.104.24",27017);
+		this.db = mongo.getDatabase("wiki");
+	}
+	public void close()
+	{
+		this.mongo.close();
+	}
 	public String ConfWebPage(String u) throws IOException
 	{
 		String context = null;
@@ -34,12 +61,46 @@ public class Content
 		buffer.close();
 		return context;
 	}
+	//从mongodb中得到相应的计数
+	public int CountFromMongodb(ArrayList<String> entity, String page_id, String keyword)
+	{
+		MongoCollection<Document> table = db.getCollection("page");
+		//System.out.println("collection: "+table.toString());
+		//Document query = new Document();
+		//query.put("id", user_id);
+		Document d = table.find(Filters.eq("id",page_id)).first();
+		if(d == null)
+			return 0;
+		else
+		{
+			ArrayList<String> terms = (ArrayList<String>) d.get("content");
+			
+			//System.out.println("docunment_size: "+d.size()+"\t"+d.toJson());
+			int sum = 0;
+			for(String ent:entity)
+			{
+				//算法的可优化部分,但是事实上很难
+				if(!ent.equals(keyword))
+				{
+					for(String term:terms)
+					{
+							if(term.contains(ent))
+								sum++;
+					}
+					//if(!ent.equals(keyword)&&d.containsValue(ent))
+					//sum++;
+				}
+			}
+			//System.out.println("mark: "+d.containsValue(".*希望.*"));
+			return sum;
+		}
+	}
 	public int CountWebPage(ArrayList<String> entities,String keyword) throws IOException
 	{
 		System.out.println("title now: "+keyword);
 		int count = 0;
 		String context = null;
-		URL url = new URL("https://zh.wikipedia.org/wiki/"+keyword);
+		URL url = new URL("https://zh.wikipedia.org/zh/"+keyword);
 		HttpURLConnection urlcon = (HttpURLConnection)url.openConnection();      
         
 		boolean disconnect = true;
@@ -71,7 +132,7 @@ public class Content
 	    	try 
 			{
 				code = urlcon.getResponseCode();
-				System.out.println("responsecode"+code);
+				//System.out.println("responsecode"+code);
 				disconnect = false;
 			} catch (IOException e) 
 			{
@@ -84,7 +145,7 @@ public class Content
 		{
 			return 0;
 		}
-		System.out.println("get connection...");
+		//System.out.println("get connection...");
 		InputStream is = urlcon.getInputStream(); 
 		BufferedReader buffer = new BufferedReader(new InputStreamReader(is,"utf-8"));    
 		String l = null;

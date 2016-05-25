@@ -72,7 +72,7 @@ public class getConceptsFWT
 		{
 			//中文格式转换
 			//String encode = java.net.URLEncoder.encode(keyword);
-		    url = new URL("https://zh.wikipedia.org/wiki/"+keyword);
+		    url = new URL("https://zh.wikipedia.org/zh/"+keyword);
 			//url = new URL("https://zh.wikipedia.org/wiki/喜欢");
 		    System.out.println("keyword: "+keyword+"concept url: "+url.toString());
 		}
@@ -112,7 +112,7 @@ public class getConceptsFWT
 	    	try 
 			{
 				code = urlcon.getResponseCode();
-				System.out.println("responsecode"+code);
+				//System.out.println("responsecode"+code);
 				disconnect = false;
 			} catch (IOException e) 
 			{
@@ -128,7 +128,7 @@ public class getConceptsFWT
 		{
 			return null;
 		}
-		System.out.println("get connection...");
+		//System.out.println("get connection...");
 		InputStream is = urlcon.getInputStream(); 
 		BufferedReader buffer = new BufferedReader(new InputStreamReader(is,"utf-8"));                  
 		String l = null;   

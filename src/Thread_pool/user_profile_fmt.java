@@ -5,16 +5,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Date.TimeFormatChange;
+import FanJian.Content;
 import NER.Hanlp_seg;
 import Sentiment.Parse;
 import Sentiment.Sent_enti;
 import WikiConcept.Category_merge;
 import WikiConcept.Con_final;
+import WikiConcept.GetIDfromMysql;
 import WikiConcept.Point;
 import WikiConcept.Tree_C;
 import WikiConcept.Tree_Processing;
@@ -22,15 +26,26 @@ import WikiConcept.new_pipeline;
 
 public class user_profile_fmt 
 {
-	public void user_profile_create(String user_id, Parse par, int number,HashMap<String,Integer> p,HashMap<String,Integer> n, ArrayList<String> weibo_p_seg, ArrayList<String> weibo_f_seg
-			, int weibo_size) throws Exception
+	public void user_profile_create(String user_id, Parse par, int number,HashMap<String,Integer> p,HashMap<String,Integer> n, ArrayList<ArrayList<String>> weibo_p_seg, 
+			ArrayList<ArrayList<String>> weibo_f_seg
+			, int weibo_size, ArrayList<String> cate_stop) throws Exception
 	{
+		
 
 		//判定是不是在多线程
 		System.out.println("NOW processing user: "+user_id);
+		
 		//数据库初始化
 		Category_merge cm = new Category_merge();
+		cm.set_CS(cate_stop);
 		cm.Init();//后面记得close
+		
+		Content con = new Content();
+		con.Init();
+		
+		GetIDfromMysql mysql = new GetIDfromMysql();
+		mysql.Init();
+		
 		
 		//循环的时候，如果直接对用户所有微博同时进行处理可能会有问题，主要是parse
 		//出现不对的依存关系
@@ -50,12 +65,11 @@ public class user_profile_fmt
 		
 		Tree_C c_tree = new Tree_C();
 		new_pipeline new_p = new new_pipeline();
-		int count = 0;
 		//处理weibo_count
 		if(number == -1)
 			number = weibo_size;
 		System.out.println("weibo_num: "+number);
-		for(int j = 0; j < weibo_size; j++)
+		for(int j = 0; j < number; j++)
 		{
 			
 			System.out.println("Now processing the "+j);
@@ -67,24 +81,23 @@ public class user_profile_fmt
 //			ArrayList<String> weibo_f_seg = h_seg.filter_seg(weibo);
 			//System.out.println("user "+user_list[i]+" weibo seg done.");
 			//parse词法分析,进行情感的标注
-			ArrayList<String> parse_result = par.Parse(weibo_p_seg);
+			ArrayList<String> parse_result = par.Parse(weibo_p_seg.get(j));
 			//去停用词
 			//ArrayList<String> weibo_no_stopwords = sw.rmStopW(weibo_f_seg);
-			ArrayList<String> weibo_no_po = this.rmPo(weibo_f_seg);
-			System.out.println("weibo_no_po: "+weibo_no_po.toString());
+			//去除微博标点符号
+			ArrayList<String> weibo_no_po = this.rmPo(weibo_f_seg.get(j));
+			//System.out.println("weibo_no_po: "+weibo_no_po.toString());
 			
 			
-			
+			System.out.println("weibo_no_po" + weibo_no_po.toString());
 			//进行wiki概念树的构建
 			//干脆直接先把所有词的情感词找好，然后再传参数进去，避免多次计算
 			//不行 因为 tfboys TFBOYS的情况存在 drop it
 			//HashMap<String,Integer> entity_senti = this.map_e_sentiment(weibo_no_po, parse_result, p, n);
-			new_p.pipe(weibo_no_po,c_tree,parse_result,p,n,cm);
+			new_p.pipe(weibo_no_po,c_tree,parse_result,p,n,cm,con,mysql);
 			//break;
 			
-			count++;
-			if(count == number)
-				break;
+			
 			
 		}
 		
@@ -105,11 +118,32 @@ public class user_profile_fmt
 		
 		//关闭数据库连接
 		cm.close();
+		con.close();
+		mysql.close();
 		//return user_id+":\n"+re;
 		//write to file
+		this.write2profile(re, user_id);
+//		File file = new File("user.profile");
+//        if(!file.exists())
+//        	file.createNewFile();
+//		synchronized{
+//		
+//        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true),"utf-8"));
+//        
+//       
+//        writer.append(user_id+":\n"+re);
+//	    writer.flush();
+//        
+//		
+//		writer.close();
+//		}
+	}
+	public synchronized void write2profile(String re,String user_id) throws IOException
+	{
 		File file = new File("user.profile");
         if(!file.exists())
         	file.createNewFile();
+		
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true),"utf-8"));
         
        
@@ -118,10 +152,12 @@ public class user_profile_fmt
         
 		
 		writer.close();
+		
 	}
 	ArrayList<String> get_user_weibo(String  path) throws Exception
 	{
 		
+		TimeFormatChange time_format = new TimeFormatChange();
 		File user_file = new File(path);
 		if(!user_file.exists())
 			throw new Exception("user file not found!");
@@ -131,7 +167,15 @@ public class user_profile_fmt
 		String weibo_content = "";
 		while((line = reader.readLine()) != null)
 		{
+			//进行时间上的过滤 
+			//要将时间戳进行转化成正常的时间格式
 			String[] sp = line.split("\t");
+			String unix_time = sp[1];
+			String time = time_format.format(unix_time);
+			String[] items = time.split("-");
+			if(Integer.parseInt(items[2]) > 20)
+				continue;
+				
 			//3 30去除用户id
 			String weibo_user = sp[6].replaceAll("转发微博", "").replaceAll("http://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?", "").replaceAll("@.*? ", "");
 			if(weibo_user.length() > 0)

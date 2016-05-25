@@ -41,9 +41,10 @@ public class Category_merge
 	{
 		this.path_a = new ArrayList<String>();
 		this.path_b = new ArrayList<String>();
-		StopCate sc = new StopCate();
-		
-		this.cate_stop = sc.InitCstop("category_stop.txt");
+	}
+	public void set_CS(ArrayList<String> cate_stop)
+	{
+		this.cate_stop = cate_stop;
 	}
 	//依旧是迭代
 	//添加父子的结构关系
@@ -51,12 +52,12 @@ public class Category_merge
 	{
 		Tree_Processing tp = new Tree_Processing();
 		//检查是不是已经包含了此类别
-		//计数加1!!!!
+		//tree node计数加1!!!!
 	    if(tree.contain(cate_b))
 	    	return;
 	    else if(depth == tree.max_depth+1)//最高层的概念还是不行
 		{
-	    	System.out.println("new concept needed");
+	    	//System.out.println("new concept needed");
 			Node top = tree.top;
 			this.path_a.clear();
 			this.path_b.clear();
@@ -75,7 +76,7 @@ public class Category_merge
 				String t = this.path_a.get(i);
 				if(t.equals(top.getName()))
 					continue;
-				System.out.println("t_a_t"+t);
+				 //System.out.println("t_a_t"+t);
 				dep_count++;
 				//每个节点加入是进行判定是否重复
 				Node tee = tp.IR_byname(tree, t);
@@ -109,10 +110,10 @@ public class Category_merge
 				if(t.equals(mu_as))
 					tree.top = te;
 				tree.nodes.put(te, tree.max_depth+dep_count);
-				System.out.println("new node"+t);
+				//System.out.println("new node"+t);
 			}
 			tree.max_depth += dep_count; //1
-			System.out.println("max_depth"+tree.max_depth);
+			//System.out.println("max_depth"+tree.max_depth);
 			
 			//更新top的值
 			top = tree.top;
@@ -122,7 +123,7 @@ public class Category_merge
 			for(int i = b_size-1; i >= 0; i--)
 			{
 				String t = this.path_b.get(i);
-				System.out.println("t_b_t"+t);
+				//System.out.println("t_b_t"+t);
 				if(t.equals(mu_as)&&i < b_size-1&&!top.sons.contains(this.path_b.get(i+1)))
 				{
 					top.sons.add(this.path_b.get(i+1));
@@ -223,7 +224,7 @@ public class Category_merge
 				}
 			}
 			
-			System.out.println("next level");
+			//System.out.println("next level");
 			this.c_merge(tree, cate_b, depth+1, entities, entity_senti);
 			
 	    }
@@ -270,7 +271,7 @@ public class Category_merge
 	//根据祖先节点以及子节点构造路径出来
 	public boolean build_category_path(String cate_f, String cate_s, ArrayList<String> path) throws Exception
 	{
-		System.out.println("find sons:"+cate_f+"\t"+cate_s);
+		//System.out.println("find sons:"+cate_f+"\t"+cate_s);
 		if(this.son_category_sql(cate_f).contains(cate_s))
 		{
 			path.add(cate_f);
@@ -493,9 +494,9 @@ public class Category_merge
 	{
 		
 		
-		System.out.println("cate"+cate_a+"\t"+"cate"+cate_b);
+		//System.out.println("cate"+cate_a+"\t"+"cate"+cate_b);
 		String p = this.zero_one(cate_a, cate_b, context);
-		System.out.println("zero_one result"+p);
+		//System.out.println("zero_one result"+p);
 		if(p != null)
 			return p;
 		//第一个为当前cate，第二个为儿子节点
@@ -504,11 +505,11 @@ public class Category_merge
 		
 		re_a.put(cate_a, null);
 		re_b.put(cate_b, null);
-		for(int i = 1; i <= 10; i++)
+		for(int i = 1; i <= 6; i++)
 		{
 			this.father_cate_hie(re_a, cate_a, 1,i+1);
 			this.father_cate_hie(re_b, cate_b, 1,i+1);
-			System.out.println("re_a size: "+re_a.size()+"re_b size: "+re_b.size());
+			//System.out.println("re_a size: "+re_a.size()+"re_b size: "+re_b.size());
 			
 			
 			Iterator iter = re_a.entrySet().iterator();
@@ -518,9 +519,9 @@ public class Category_merge
 				String key = (String) entry.getKey();
 				if(re_b.containsKey(key))
 				{
-					System.out.println("mu_father: "+key);
-					System.out.println("path a:"+this.toPath(re_a, key));
-					System.out.println("path b:"+this.toPath(re_b, key));
+//					System.out.println("mu_father: "+key);
+//					System.out.println("path a:"+this.toPath(re_a, key));
+//					System.out.println("path b:"+this.toPath(re_b, key));
 					
 					this.path_a = this.toPath(re_a, key);
 					this.path_b = this.toPath(re_b, key);
@@ -625,7 +626,7 @@ public class Category_merge
 		//就是0,1层直接解决问题
 		if(f != null)
 		{
-			System.out.println("find solution!");
+			//System.out.println("find solution!");
 			return f;
 		}
 		else
@@ -685,7 +686,7 @@ public class Category_merge
 	//更改为BFS
 	public ArrayList<String> succeed(String cate_a, String cate_b) throws Exception
 	{
-		System.out.println("succeed "+cate_a+"\t"+cate_b);
+		//System.out.println("succeed "+cate_a+"\t"+cate_b);
 		//如果是两个实体直接返回空
 		if(!cate_a.contains("Category"))
 		{
@@ -712,7 +713,7 @@ public class Category_merge
 			{
 				if(a_father.contains(mid.get(i)))
 				{
-					System.out.println("succeed return null");
+					//System.out.println("succeed return null");
 					return null;
 				}
 			}
@@ -777,10 +778,10 @@ public class Category_merge
 		ArrayList<String> a_father = this.father_category(cate_a);
 		for(int i = 0; i < a_father.size(); i++)
 		{
-			System.out.println("succeed a_father"+a_father.get(i));
+			//System.out.println("succeed a_father"+a_father.get(i));
 			if(this.succeed(a_father.get(i), cate_b).size() > 0)
 			{
-				System.out.println("find mutural father"+a_father.get(i));
+				//System.out.println("find mutural father"+a_father.get(i));
 				return a_father.get(i);
 			}
 		}

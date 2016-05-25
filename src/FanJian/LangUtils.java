@@ -19,7 +19,7 @@ public class LangUtils {
 	/**
 	 * Prevent this class to be instantiated.
 	 */
-	private LangUtils () {} 
+public LangUtils () {} 
 	
 	static {
 	  // Initialize the regular expression for FilterMarks().

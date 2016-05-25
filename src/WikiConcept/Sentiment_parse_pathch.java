@@ -33,7 +33,7 @@ public class Sentiment_parse_pathch
 			String temp = parse_re.get(i);
 			//
 			
-			System.out.println(temp);
+			//System.out.println(temp);
 			String fi = null;
 			String f_r = "\\(.*?-";
 			Pattern p_u = Pattern.compile(f_r);

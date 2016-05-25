@@ -103,7 +103,7 @@ public class user_profile_create
 				//干脆直接先把所有词的情感词找好，然后再传参数进去，避免多次计算
 				//不行 因为 tfboys TFBOYS的情况存在 drop it
 				//HashMap<String,Integer> entity_senti = this.map_e_sentiment(weibo_no_po, parse_result, p, n);
-				new_p.pipe(weibo_no_po,c_tree,parse_result,p,n,cm);
+				//new_p.pipe(weibo_no_po,c_tree,parse_result,p,n,cm);
 				
 //				count++;
 //				if(count == number)

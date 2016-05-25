@@ -50,6 +50,11 @@ public class Tree_Processing
 					count++;
 				}
 			}
+			else
+			{
+				app_time = t_n.app_time;
+				sentiment = t_n.sentiment;
+			}
 			t_n.app_time = app_time;
 			if(count != 0)
 				t_n.sentiment = sentiment/(double)count;// 需不需要重新弄？
