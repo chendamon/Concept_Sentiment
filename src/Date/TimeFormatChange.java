@@ -11,5 +11,12 @@ public class TimeFormatChange
 		//System.out.println(date);
 		return date;
 	}
+	public String format_cal(String time)
+	{
+		Long timestamp = Long.parseLong(time);
+		String date = new java.text.SimpleDateFormat("yyyyMMdd").format(new java.util.Date(timestamp));  
+		//System.out.println(date);
+		return date;
+	}
 
 }

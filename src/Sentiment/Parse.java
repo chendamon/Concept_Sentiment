@@ -23,29 +23,36 @@ public class Parse
 	}
 	public void Init()
 	{
-		String model = "edu/stanford/nlp/models/lexparser/chineseFactored.ser.gz";
-		lp = LexicalizedParser.loadModel(model);
+		String[] options = {"-MAX_ITEMS", "500000"};
+		String model = "edu/stanford/nlp/models/lexparser/chinesePCFG.ser.gz";
+		lp = LexicalizedParser.loadModel(model,options);
 	}
-	public ArrayList<String> Parse(ArrayList<String> seg_result)
+	public ArrayList<String> ps(String weibo)
 	{
-		//重构分词之后的句子
-		int size = seg_result.size();
-		String sentence = "";
-		for(int i = 0; i < size-1; i++)
-		{
-			sentence += seg_result.get(i)+"\t";
-//			if(seg_result.get(i).endsWith("\n"))
-//				sentence += "\n";
-//			else sentence += "\t";
-			
-		}
-		sentence += seg_result.get(size-1);
-		System.out.println("sentence: "+sentence);
-		//parse part
-		//2015/12/1
-//		String model = "edu/stanford/nlp/models/lexparser/chineseFactored.ser.gz";
-//		LexicalizedParser lp = LexicalizedParser.loadModel(model);
-		Tree t = lp.parse(sentence);
+		//String[] options = {"-MAX_ITEMS", "500000"};
+		Tree t = lp.parse(weibo);
+		
+		System.out.println(t);
+		if(!t.toString().contains("ROOT"))
+			return null;
+		//变换其他格式,依赖格式
+		ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure
+				(t);
+		
+	    Collection<TypedDependency> tdl = gs.typedDependenciesCollapsed();
+	   // System.out.println(tdl);
+	    
+	    ArrayList<String> ps = new ArrayList<String>();
+	    for (Iterator<TypedDependency> iterator = tdl.iterator(); iterator.hasNext();) 
+	    {
+            String arr = iterator.next().toString();
+            ps.add(arr);
+        }
+	    return ps;
+	}
+	public  ArrayList<String> Parse(ArrayList<String> seg_result)
+	{
+		Tree t = lp.parseStrings(seg_result);
 		//System.out.println(t);
 		//变换其他格式,依赖格式
 		ChineseGrammaticalStructure gs = new ChineseGrammaticalStructure(t);

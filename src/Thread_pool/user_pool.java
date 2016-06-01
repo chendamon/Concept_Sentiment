@@ -99,8 +99,8 @@ public class user_pool
 		ThreadPoolExecutor executor = new ThreadPoolExecutor(thread_num, 50, 200, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<Runnable>(thread_num));
 		
-		Parse par = new Parse();
-		par.Init();
+//		Parse par = new Parse();
+//		par.Init();
 		//情感词的提前准备
 		Sent_enti sentiment_table = new Sent_enti();
 		sentiment_table.Init();
@@ -127,32 +127,53 @@ public class user_pool
 	    	String user_id = user_list[i];
 	    	user_profile_fmt fmt = new user_profile_fmt();
 	    	//分词进行外提 分词 要在整个县城之外进行， 否则hanlp的错误
-	    	ArrayList<String> weibo_content = fmt.get_user_weibo("active_user/"+user_id);
-	    	int size = weibo_content.size();
-	    	ArrayList<String> p_seg = null;
-	    	ArrayList<String> f_seg = null;
+//	    	//ArrayList<String> weibo_content = fmt.get_user_weibo("active_user/"+user_id);
+//	    	int size = weibo_content.size();
+//	    	ArrayList<String> p_seg = null;
+//	    	ArrayList<String> f_seg = null;
+//	    	ArrayList<String> p_result = null;
+//	    	
+//	    	//ArrayList<ArrayList<String>> pp_seg = new ArrayList<ArrayList<String>>();
+//	    	ArrayList<ArrayList<String>> ff_seg = new ArrayList<ArrayList<String>>();
+//	    	
+//	    	ArrayList<ArrayList<String>> parse_result = new ArrayList<ArrayList<String>>();
+//	    	for(int j = 0; j < size; j++)
+//			{
+//				//System.out.println("Now processing the "+j);
+//				String weibo = weibo_content.get(j);
+//				weibo = weibo.replaceAll("\\s+", "");
+//				System.out.println("weibo"+weibo);
+//				//hanlp seg
+//				p_seg = hanlp.pure_seg(weibo);
+//				System.out.println("pseg"+p_seg.toString());
+//				f_seg = hanlp.filter_seg(weibo);
+//				for(int k = 0; k < p_seg.size(); k++)
+//				{
+//					if(p_seg.get(k).length() == 0)
+//					{
+//						p_seg.remove(k);
+//						k--;
+//					}
+//				}
+//				if(p_seg.size() == 0)
+//					continue;
+//			    System.out.println(p_seg.size()+"\t"+p_seg.toString());
+//				p_result = par.
+//						Parse(p_seg);
+//				
+//				//pp_seg.add(p_seg);
+//				ff_seg.add(f_seg);
+//				parse_result.add(p_result);
+//				
+//				
+//			}
 	    	
-	    	ArrayList<ArrayList<String>> pp_seg = new ArrayList<ArrayList<String>>();
-	    	ArrayList<ArrayList<String>> ff_seg = new ArrayList<ArrayList<String>>();
-	    	for(int j = 0; j < size; j++)
-			{
-				//System.out.println("Now processing the "+j);
-				String weibo = weibo_content.get(j);
-				weibo = weibo.replaceAll("\\s+", "");
-				//hanlp seg
-				p_seg = hanlp.pure_seg(weibo);
-				f_seg = hanlp.filter_seg(weibo);
-				
-				pp_seg.add(p_seg);
-				ff_seg.add(f_seg);
-			}
 	    	
 	    	
-	    	
-	        System.out.println("seg done, This thread processing user: "+user_id);
+	      //  System.out.println("seg done, This thread processing user: "+user_id);
 	        try
 	        {
-	        	executor.execute(new user_profile(user_id,par,weibo_num,p,n,pp_seg,ff_seg,size,fmt,cate_stop));
+	        	executor.execute(new user_profile(user_id,weibo_num,p,n,fmt,cate_stop,hanlp));
 	        	//st.show_time();
 	        }
 	        catch(Exception e)
@@ -166,6 +187,7 @@ public class user_pool
             executor.getQueue().size()+"，已执行玩别的任务数目："+executor.getCompletedTaskCount());
             
         }
+        st.show_time();
         executor.shutdown();
         //结果写入文件
 //        File file = new File("user.profile");
@@ -182,9 +204,10 @@ public class user_pool
 //        }
 //		
 //		writer.close();
-		st.show_time();
+		//st.show_time();
         
 	}
+	
 	static String[] get_user_list(String dirname) throws Exception
 	{
 		File file = new File(dirname);
@@ -198,28 +221,78 @@ class user_profile implements Runnable
 {
 	user_profile_fmt fmt;
 	String id;
-	Parse par;
+	//Parse par;
 	int count;
 	HashMap<String,Integer> p;
 	HashMap<String,Integer> n;
-	ArrayList<ArrayList<String>> p_seg;
-	ArrayList<ArrayList<String>> f_seg;
 	ArrayList<String> cate_stop;
+	Hanlp_seg hanlp;
+	Parse par;
 	int weibo_size;
-	user_profile(String id, Parse par,int count,HashMap<String,Integer> p,HashMap<String,Integer> n, ArrayList<ArrayList<String>> p_seg, ArrayList<ArrayList<String>> f_seg, int weibo_size,
-			user_profile_fmt fmt, ArrayList<String> cate_stop)
+	ArrayList<ArrayList<String>> parse_result;
+	ArrayList<ArrayList<String>> ff_seg;
+	ArrayList<String> weibo_content;
+	
+	user_profile(String id,int count,HashMap<String,Integer> p,HashMap<String,Integer> n, 
+			user_profile_fmt fmt, ArrayList<String> cate_stop, Hanlp_seg hanlp)
 	{
 		this.fmt = fmt;
 		this.id = id;
-		this.par = par;
+		//this.par = par;
 		this.count = count;
 		this.p = p;
 		this.n = n;
-		this.p_seg = p_seg;
-		this.f_seg = f_seg;
-		this.weibo_size = weibo_size;
+		//this.p_seg = p_seg;
+		//this.f_seg = f_seg;
+		//this.weibo_size = weibo_size;
 		this.cate_stop = cate_stop;
+		//this.parse_result = parse_result;
+		this.hanlp = hanlp;
+		//this.par = par;
 	}
+//	void Init() throws Exception
+//	{
+//		//write file process here
+//		ArrayList<String> weibo_content = fmt.get_user_weibo("active_user/"+id);
+//		this.weibo_size = weibo_content.size();
+//		int size = weibo_content.size();
+//		ArrayList<String> p_seg = null;
+//		ArrayList<String> f_seg = null;
+//		ArrayList<String> p_result = null;
+//		
+//		//ArrayList<ArrayList<String>> pp_seg = new ArrayList<ArrayList<String>>();
+//		this.ff_seg = new ArrayList<ArrayList<String>>();
+//		
+//		this.parse_result = new ArrayList<ArrayList<String>>();
+//		for(int j = 0; j < size; j++)
+//		{
+//			String weibo = weibo_content.get(j);
+//			weibo = weibo.replaceAll("\\s+", "");
+//			//System.out.println("weibo"+weibo);
+//			//hanlp seg
+//			p_seg = hanlp.pure_seg(weibo);
+//			f_seg = hanlp.filter_seg(weibo);
+//			for(int k = 0; k < p_seg.size(); k++)
+//			{
+//				if(p_seg.get(k).length() == 0)
+//				{
+//					p_seg.remove(k);
+//					k--;
+//				}
+//			}
+//			if(p_seg.size() == 0)
+//				continue;
+//		    //System.out.println(p_seg.size()+"\t"+p_seg.toString());
+//			p_result = par.Parse(p_seg);
+//			
+//			//pp_seg.add(p_seg);
+//			ff_seg.add(f_seg);
+//			parse_result.add(p_result);
+//		}
+//	}
+//		
+//		
+//	}
 
 //	@Override
 //	public Object call() throws Exception 
@@ -233,8 +306,12 @@ class user_profile implements Runnable
 	{
 		// TODO Auto-generated method stub
 		try {
+			// Init();
 			//user profile构建主函数
-			this.fmt.user_profile_create(id, par, count, p, n,p_seg,f_seg,weibo_size,cate_stop);
+			//String user_id, int number,HashMap<String,Integer> p,HashMap<String,Integer> n,
+			// ArrayList<String> cate_stop,Hanlp_seg hanlp, Parse par,int weibo_size,ArrayList<ArrayList<String>> parse_re,
+			// ArrayList<ArrayList<String>> ff_seg,ArrayList<String> weibo_content
+			this.fmt.user_profile_create(id,count, p, n,cate_stop,hanlp);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

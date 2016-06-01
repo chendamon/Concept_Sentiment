@@ -29,10 +29,10 @@ import java.util.regex.Pattern;
  */
 public class Category_merge 
 {
-	java.sql.Connection conn;
-	java.sql.Statement stmt;
-	String sql;
-	String url;
+	public java.sql.Connection conn;
+	public java.sql.Statement stmt;
+	public String sql;
+	public String url;
 	ArrayList<String> cate_stop;
 	//记录从当前节点到祖先的路径的数组
 	ArrayList<String> path_a;
@@ -48,7 +48,7 @@ public class Category_merge
 	}
 	//依旧是迭代
 	//添加父子的结构关系
-	public void c_merge(Tree_C tree, String cate_b, int depth, ArrayList<String> entities, HashMap<String,Integer> entity_senti) throws Exception
+	public void c_merge(Tree_C tree, String cate_b, int depth, ArrayList<String> entities, HashMap<String,Double> entity_senti) throws Exception
 	{
 		Tree_Processing tp = new Tree_Processing();
 		//检查是不是已经包含了此类别
@@ -101,8 +101,8 @@ public class Category_merge
 				}
 				if(entity_senti.containsKey(t))
 				{
-					int sentiment = entity_senti.get(t);
-					te.sentiment = (double)sentiment;
+					double sentiment = entity_senti.get(t);
+					te.sentiment = sentiment;
 				}
 				te.depth = tree.max_depth+dep_count;
 				
@@ -149,8 +149,8 @@ public class Category_merge
 				}
 				if(entity_senti.containsKey(t))
 				{
-					int sentiment = entity_senti.get(t);
-					te.sentiment = (double)sentiment;
+					double sentiment = entity_senti.get(t);
+					te.sentiment = sentiment;
 				}
 				te.depth = dep_count;
 				
@@ -208,8 +208,8 @@ public class Category_merge
 							}
 							if(entity_senti.containsKey(name))
 							{
-								int sentiment = entity_senti.get(name);
-								t.sentiment = (double)sentiment;
+								double sentiment = entity_senti.get(name);
+								t.sentiment = sentiment;
 							}
 							t.depth = depth-dep_count;
 							tree.nodes.put(t, depth-dep_count);

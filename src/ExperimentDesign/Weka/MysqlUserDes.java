@@ -43,6 +43,12 @@ public class MysqlUserDes
 		this.verify = verify;
 		this.des = des;
 	}
+	public String toString()
+	{
+		return this.id+"\t"+name+"\t"+gender+"\t"+location+"\t"+this.account_time+"\t"+this.weibo_num+"\t"+
+	this.followee+"\t"+this.follower+"\t"+this.verify+"\t"+this.des;
+		
+	}
 	
 
 }

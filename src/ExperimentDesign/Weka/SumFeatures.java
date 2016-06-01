@@ -1,9 +1,19 @@
 package ExperimentDesign.Weka;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import Date.TimeFormatChange;
 
 /*
  * 对特征的综合，然后进行格式的调整。
@@ -11,12 +21,88 @@ import java.util.regex.Pattern;
  */
 public class SumFeatures 
 {
-	//根据两个用户id得到最终的特征集 
-	public void SummrizeFeatures(String user_one, String user_two) throws SQLException
+	//write weka file title
+	public String Title()
 	{
-		FeaturesFromMysql fm = new FeaturesFromMysql();
+		/*
+		 * double count_of_follower_ratio = num_of_follower_one/(double)num_of_follower_two;
+		double count_of_friends_ratio = num_of_friends_one/(double)num_of_friends_two;
+		double follower_friends_ratio = num_of_follower_two/(double)num_of_friends_two;
+		
+		double length_of_name_ratio = len_of_name_one/(double)len_of_name_two;
+		
+		int lang_both = 1;
+		
+		String ver_both = String.valueOf(ver_one)+String.valueOf(ver_two);
+		
+		String gender_both = String.valueOf(gender_one)+String.valueOf(gender_two);
+		
+		double days_ratio
+		 */
+		String title = "";
+		title += "@relation weibo_retweet\n";
+		title += "@attribute num_of_follower_one real\n"
+			  + "@attribute num_of_follower_two real\n"
+			  + "@attribute num_of_friends_one real\n"
+			  + "@attribute num_of_friends_two real\n"
+			  + "@attribute ver_one {TRUE, FALSE}\n"
+			  + "@attribute ver_two {TRUE, FALSE}\n"
+			  + "@attribute len_of_name_one real\n"
+			  + "@attribute len_of_name_two real\n"
+			  + "@attribute len_of_dep_one real\n"
+			  + "@attribute len_of_dep_two real\n"
+			  + "@attribute location_one string\n"
+			  + "@attribute location_two string\n"
+			  + "@attribute gender_one real\n"
+			  + "@attribute gender-two real\n"
+			  + "@attribute time_one string\n"
+			  + "@attribute time_two string\n"
+			  + "@attribute user_influence_one real\n"
+			  + "@attribute user_influence_two real\n"
+			  + "@attribute num_of_hash_one real\n"
+			  + "@attribute num_of_hash_two real\n"
+			  + "@attribute num_of_url_one real\n"
+			  + "@attribute num_of_url_two real\n"
+			  + "@attribute num_of_at_one real\n"
+			  + "@attribute num_of_at_two real\n"
+			  + "@attribute tweet_len_one real\n"
+			  + "@attribute tweet_len_two real\n"
+			  + "@attribute count_of_follower_ratio real\n"
+			  + "@attribute count_of_frineds_ratio real\n"
+			  + "@attribute follower_friends_ratio real\n"
+			  + "@attribute lang_both real\n"
+			  + "@attribute ver_both string\n"
+			  + "@attribute gender_both string\n"
+			  + "@attribute days_ratio real\n"
+			  + "@attribute distance string\n";
+		title += "@data";
+		return title;
+	}
+	public void Write(String user_one, String user_two, FeaturesFromMysql mysql) throws Exception
+	{
+		String title = this.Title();
+		String features = this.SummrizeFeatures(user_one, user_two, mysql);
+		File file = new File("weibo_retweet.arff");
+		if(file.exists())
+			file.delete();
+		file.createNewFile();
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true),"utf-8"));
+        
+	       
+        writer.append(title+"\n"+features);
+	    writer.flush();
+        writer.newLine();
+		
+		writer.close();
+	}
+	//根据两个用户id得到最终的特征集 
+	public String SummrizeFeatures(String user_one, String user_two, FeaturesFromMysql fm) throws Exception
+	{
+		//FeaturesFromMysql fm = new FeaturesFromMysql();
 		MysqlUserDes one = fm.getUserInfo(user_one);
 		MysqlUserDes two = fm.getUserInfo(user_two);
+		
+		TimeFormatChange time_change = new TimeFormatChange();
 		 /*
 		  * Followee and Follower:
 		 * num_of_follower
@@ -120,10 +206,14 @@ public class SumFeatures
 		
 		String gender_both = String.valueOf(gender_one)+String.valueOf(gender_two);
 		
-		double days_ratio = Integer.parseInt(time_one)/(double)Integer.parseInt(time_two);
+		double days_ratio = Integer.parseInt(time_change.format_cal(time_one))/(double)Integer.parseInt(time_change.format_cal(time_two));
 		
 		String[] items_one = one.location.split("\\s");
-		String[] items_two = one.location.split("\\s");
+//		for(int i = 0; i < items_one.length; i++)
+//			System.out.println(items_one[i]);
+		String[] items_two = two.location.split("\\s");
+//		for(int i = 0; i < items_two.length; i++)
+//			System.out.println(items_two[i]);
 		String distance = "far";
 		int size_one = items_one.length;
 		int size_two = items_two.length;
@@ -136,18 +226,60 @@ public class SumFeatures
 		
 		
 		
-		
+		String features = num_of_follower_one+","+num_of_follower_two+","+num_of_friends_one+","+num_of_friends_two+","+ver_one+","+ver_two+","+len_of_name_one+","+len_of_name_two+","+
+		                len_of_dep_one+","+len_of_dep_two+","+location_one+","+location_two+","+gender_one+","+gender_two+","+time_one+","+time_two+","+user_influence_one+","+user_influence_two+","
+		                
+		                +num_of_hash_one+","+num_of_hash_two+","+num_of_url_one+","+num_of_url_two+","+num_of_at_one+","+num_of_at_two+","+tweet_len_one+","+tweet_len_two+","+
+		                
+		                count_of_follower_ratio+","+count_of_friends_ratio+","+follower_friends_ratio+","+length_of_name_ratio+","+lang_both+","+ver_both+","+gender_both+","+days_ratio+","+distance;
 		
 		
 
-		
+		return features;
 		
 		
 	}
-	private ArrayList<String> Content(String user_id)
+	//get weibo content from user file
+	private ArrayList<String> Content(String user_id) throws Exception
 	{
-		ArrayList<String> content = new ArrayList<String>();
-		return content;
+		TimeFormatChange time_format = new TimeFormatChange();
+		File user_file = new File("active_user/"+user_id);
+		if(!user_file.exists())
+			throw new Exception("user file not found!");
+		ArrayList<String> weibo_content_array = new ArrayList<String>();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(user_file),"utf-8"));
+		String line = "";
+		String weibo_content = "";
+		while((line = reader.readLine()) != null)
+		{
+			//进行时间上的过滤 
+			//要将时间戳进行转化成正常的时间格式
+			String[] sp = line.split("\t");
+			String unix_time = sp[1];
+			String time = time_format.format(unix_time);
+			String[] items = time.split("-");
+			if(Integer.parseInt(items[2]) > 20)
+				continue;
+				
+			//3 30去除用户id
+			String weibo_user = sp[6];//.replaceAll("转发微博", "").replaceAll("http://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?", "").replaceAll("@.*? ", "");
+			if(weibo_user.length() > 0)
+				weibo_content_array.add(weibo_user);
+			else
+			{
+				String weibo_src = sp[10];//.replaceAll("转发微博", "").replaceAll("http://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?", "").replaceAll("@.*? ", "");
+				weibo_content_array.add(weibo_src);
+			}
+//			weibo_content += sp[6]+sp[10];
+//			weibo_content = weibo_content.replaceAll("转发微博", "");
+		}
+		reader.close();
+		System.out.println("user weibo read done. "+weibo_content_array.size());
+		while(weibo_content_array.size() > 100)
+		{
+			weibo_content_array.remove(0);
+		}
+		return weibo_content_array;
 	}
 	private int[] TweetFeatures(ArrayList<String> content)//不能直接调用之前的，因为已经去除了@以及url
 	{

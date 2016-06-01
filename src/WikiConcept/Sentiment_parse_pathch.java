@@ -1,8 +1,15 @@
 package WikiConcept;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.hankcs.hanlp.corpus.dependency.CoNll.CoNLLSentence;
+import com.hankcs.hanlp.corpus.dependency.CoNll.CoNLLWord;
 
 /*
  * 16/3/29
@@ -25,7 +32,7 @@ public class Sentiment_parse_pathch
 	//把parse的结果进行转换形式，转成hashmap
 	//[nsubj(棒-4, 权力的游戏-1), advmod(棒-4, 简直-2), advmod(棒-4, 太-3), root(ROOT-0, 棒-4), dep(棒-4, 了-5)]
 	//[群 粉丝] [群 强大]
-	public void Init(ArrayList<String> parse_re)
+	public void Init_p(ArrayList<String> parse_re)
 	{
 		int size = parse_re.size();
 		for(int i = 0; i < size; i++)
@@ -59,6 +66,34 @@ public class Sentiment_parse_pathch
 		}
 		//return pm;
 	}
+	//hanlp parse result process
+	public void Init(CoNLLSentence sen)
+	{
+		String[][] edges = sen.getEdgeArray();
+		CoNLLWord[] words = sen.getWordArrayWithRoot();
+		int m_size = edges.length;
+		for(int i = 0; i < m_size; i++)
+		{
+			int n_size = edges[i].length;
+			for(int j = 0; j < n_size; j++)
+			{
+				if(!(edges[i][j] == null))
+				{
+					if(j == 0)//root
+					{
+						p_map.add(words[i-1].LEMMA);
+						n_map.add("ROOT");
+					}
+					else
+					{
+						p_map.add(words[i-1].LEMMA);
+						n_map.add(words[j-1].LEMMA);
+					}
+				}
+			}
+		}
+		
+	}
 	//判断是否为情感词
 	public int is_eword(String word, HashMap<String,Integer> p, HashMap<String,Integer> n)
 	{
@@ -67,6 +102,24 @@ public class Sentiment_parse_pathch
 		else if(n.containsKey(word))
 			return -1;
 		return 0;
+	}
+	//for the stanford parser seg not acc
+	public ArrayList<Integer> Indexof(HashMap<String, Integer> p, String entity)
+	{
+		ArrayList<Integer> indexs = new ArrayList<Integer>();
+		Iterator<Map.Entry<String, Integer>> iterator = p.entrySet().iterator();
+		int index = 0;
+		while (iterator.hasNext()) 
+		{
+			Entry<String, Integer> entry = iterator.next();
+			index++;
+			String key = entry.getKey();
+			if(key.contains(entity))
+				indexs.add(index);
+			//entry.getValue();
+		}
+		return indexs;
+		
 	}
 	//针对一个entity 进行查找
 	//马丹，这个是双向的，难道我要用两个map？
@@ -77,6 +130,8 @@ public class Sentiment_parse_pathch
 		scaned.put(entity, 0);
 		double sentiment = 0.0;
 		int s = 0;
+		ArrayList<Integer> p_index = null;
+		ArrayList<Integer> n_index  =null;
 		if(this.p_map.indexOf(entity)!=-1)
 		{
 			for(int i = 0; i < this.p_map.size(); i++)
@@ -89,7 +144,7 @@ public class Sentiment_parse_pathch
 						return 0;
 					else if((s = this.is_eword(this.n_map.get(i), p, n)) != 0)
 					{
-						//System.out.println("sentiment"+this.n_map.get(i));
+						System.out.println("sentiment"+this.n_map.get(i));
 						return s;
 					}
 					else 
@@ -109,7 +164,7 @@ public class Sentiment_parse_pathch
 						return 0;
 					else if((s = this.is_eword(this.p_map.get(i), p, n)) != 0)
 					{
-						//System.out.println("sentiment"+this.p_map.get(i));
+						System.out.println("sentiment"+this.p_map.get(i));
 						return s;
 					}
 					else 

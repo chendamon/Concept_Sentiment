@@ -33,6 +33,7 @@ public class Content
 	{
 		this.mongo = new MongoClient("172.19.104.24",27017);
 		this.db = mongo.getDatabase("wiki");
+		System.out.println("mongodb init done");
 	}
 	public void close()
 	{
@@ -62,7 +63,7 @@ public class Content
 		return context;
 	}
 	//从mongodb中得到相应的计数
-	public int CountFromMongodb(ArrayList<String> entity, String page_id, String keyword)
+	public int CountFromMongodb(ArrayList<String> entity, String page_id, String keyword, String entity_now)
 	{
 		MongoCollection<Document> table = db.getCollection("page");
 		//System.out.println("collection: "+table.toString());
@@ -80,7 +81,7 @@ public class Content
 			for(String ent:entity)
 			{
 				//算法的可优化部分,但是事实上很难
-				if(!ent.equals(keyword))
+				if(!entity_now.contains(ent))//entity_now is the entity to be done
 				{
 					for(String term:terms)
 					{

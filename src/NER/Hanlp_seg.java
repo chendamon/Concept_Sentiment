@@ -23,9 +23,10 @@ public class Hanlp_seg
 		System.out.println(termList);
 	}
 	//结果只有分词 没有词性标注
-	public ArrayList<String> pure_seg(String weibo)
+	public  ArrayList<String> pure_seg(String weibo)
 	{
 		List<Term> termList = null;
+	//	System.out.println(weibo);
 		NLPTokenizer nlp = new NLPTokenizer();
 		try
 		{
@@ -49,10 +50,20 @@ public class Hanlp_seg
 	}
 	public ArrayList<String> filter_seg(String weibo)
 	{
-		NLPTokenizer nlp = new NLPTokenizer();
-		List<Term> termList = nlp.segment(weibo);
+		Segment segment = new CRFSegment();
+		segment.enablePartOfSpeechTagging(true);
+		//NLPTokenizer nlp = new NLPTokenizer();
+		List<Term> termList = segment.seg(weibo);
+		System.out.println("seg re:"+termList.toString());
 		int size = termList.size();
 		ArrayList<String> ps = new ArrayList<String>();
+		ArrayList<String> con = new ArrayList<String>();
+		for(int i = 0; i < size; i++)
+		{
+			String regex = "/[a-z]*[0-9]*";
+			String conta = termList.get(i).toString().replaceAll(regex, "");
+			con.add(conta);
+		}
 		for(int i = 0; i < size; i++)
 		{
 			String regex = "/[a-z]*[0-9]*";
@@ -63,7 +74,7 @@ public class Hanlp_seg
 			{
 				pos_tag = m_t.group(0);
 			}
-			if(pos_tag.contains("n"))
+			if(pos_tag.contains("n")&&!pos_tag.contains("v"))
 			{
 				String conta = termList.get(i).toString().replaceAll(regex, "");
 				//单个数字，字母的情况要进行去除
@@ -72,6 +83,8 @@ public class Hanlp_seg
 //				if(conta.replaceAll(reg, "").length() == 0)
 //					continue;
 				if(conta.replaceAll(re, "").length() == 0)
+					continue;
+				if(i+1 < size&&i-1>= 0&&con.get(i-1).equals("[")&&con.get(i+1).equals("]"))//emoij
 					continue;
 				ps.add(conta);
 			}

@@ -91,7 +91,7 @@ public class StableMatchingProblem
 	{
 		for(int man:men)
 		{
-			if(man == 0)
+			if(man == -1)
 				return true;
 		}
 		return false;
